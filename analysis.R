@@ -211,210 +211,41 @@ ggplot(a_now, aes(x=sample, y=proportion, group = agree_now, fill = agree_now)) 
   theme(legend.position=c(0.9,0.6))
 ggsave(filename = here::here("images", "agreed_with_cons_now.png"))
 
-#####################
-# here
-###################
-
 #######################################################################################################################
-####### Survey based graph of proportion of HHS and who they think own the conservation area  ########
+####### Survey based graph of proportion of HHS and a number of different variables (can be adjusted with copy paste)
 ######################################################################################################################
 
-strat_design_srvyr_hhs <- hhs %>% 
-  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, loc_name, cons_owner)) %>% 
-  mutate(group_ranch = ifelse(loc_name %in% 3:4, "Shompole", "Olkiramatian"))
+strat_design_srvyr_hhs <- hhs_wealth %>% 
+  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, sample, skip_meal_before, skip_meal_after, 
+                                                                      occupation, access_edu, access_health, access_elec, access_water,
+                                                                      crop_yn, conserve_authority, graz_hhcons, graz_rules, graz_rules_help,
+                                                                      settle_rules, settle_rules_help, forest_rules, forest_rules_help,
+                                                                      water_rules, water_rules_help, wildlife_rules, wildlife_rules_help,
+                                                                      receive_income, cons_payment_fct, income_informed, influence,
+                                                                      transparency, accountability, women_power, wild_perception))
 
-c <- strat_design_srvyr_hhs %>% 
-  mutate(cons_owner = factor(cons_owner, levels = c(1,2,3,4,5,-99), labels=c("Group Ranch members","KWS","Tourism Operator", "Conservation Committee", "Group Ranch Committee", "Don't Know"))) %>% 
-  group_by(group_ranch, cons_owner) %>% 
-  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-
-ggplot(c, aes(x=group_ranch, y=proportion, group = cons_owner, fill = cons_owner)) +
-  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
-  geom_errorbar(data=c, aes(ymax = proportion_upp, ymin = proportion_low), 
-                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
-  guides(fill=guide_legend(title=NULL)) +
-  scale_fill_manual(values=c("#008b45", "#cd3700", "tan3", "yellow3","#6FAFCA", "#DFDFDF"), 
-                    #name="Legend Title",
-                    breaks=c("Group Ranch members","KWS","Tourism Operator", "Conservation Committee", "Group Ranch Committee", "Don't Know"),
-                    labels=c("Group Ranch members","KWS","Tourism Operator", "Conservation Committee", "Group Ranch Committee", "Don't Know")) +
-  labs(x="Group Ranch", y = "Proportion of Households") +
-  scale_y_continuous(limits=c(0, 1)) +
-  theme_sjplot() + 
-  theme(legend.position=c(0.9,0.8))
-
-
-
-######################################################################################################################
-####### Survey based graph of proportion of HHS who believe their household has an influence in GR decision making 
-######################################################################################################################
-
-
-strat_design_srvyr_hhs <- hhs %>% 
-  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, loc_name, hh_influence, gr_mem)) %>% 
-  mutate(group_ranch = ifelse(loc_name %in% 3:4, "Shompole", "Olkiramatian"))
-
-###### totals ######
-
-b <- strat_design_srvyr_hhs %>% 
-  mutate(hh_influence = na_if(hh_influence, "-99")) %>% 
-  mutate(hh_influence = factor(hh_influence, levels = c(1,2,3,-99), labels=c("No influence","A little influence","A lot of influence", "Don't know"))) %>% 
-  #mutate(hh_influence = replace(hh_influence, hh_influence=c("Don't Know"), NA)) %>% 
-  mutate(gr_mem = replace(gr_mem, gr_mem<0, NA)) %>% 
-  mutate(gr_mem = factor(gr_mem, levels = c(0,1,-99), labels=c("No","Yes", NA))) %>% 
-  group_by(group_ranch, hh_influence, gr_mem) %>% 
+a <- strat_design_srvyr_hhs %>% 
+  group_by(sample, wild_perception) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  drop_na()
+  na.omit() 
 
-#Shompole
-ggplot(data = subset(b, group_ranch=="Shompole"), aes(x=hh_influence, y=total, group = gr_mem, fill = gr_mem)) +
-  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width=0.95) + 
-  #facet_grid(~group_ranch)+
-  geom_errorbar(data = subset(b, group_ranch=="Shompole"), aes(ymax = total_upp, ymin = total_low), 
-                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
-  #guides(fill=guide_legend(title=NULL)) +
-  scale_fill_manual(values=c("#cd3700", "#008b45"), 
-                    name="Household head is\nregistered member",
-                    breaks=c("No", "Yes"),
-                    labels=c("No", "Yes")) +
-  labs(title="Shompole - How much influence do you feel this household\nhas in decision making in this Group Ranch (2 ppl said they don't know)",
-       x="Influence household has in decision making", y = "Number of Households") +
-  scale_y_continuous(breaks = seq(0,1000, by = 200), limits = c(0,1000)) +
-  theme_sjplot() #+ 
-#theme(legend.position=c(0.975,0.6)) 
-#geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
-
-#Olkiramatian
-ggplot(data = subset(b, group_ranch=="Olkiramatian"), aes(x=hh_influence, y=total, group = gr_mem, fill = gr_mem)) +
-  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width=0.95) + 
-  #facet_grid(~group_ranch)+
-  geom_errorbar(data = subset(b, group_ranch=="Olkiramatian"), aes(ymax = total_upp, ymin = total_low), 
-                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
-  #guides(fill=guide_legend(title=NULL)) +
-  scale_fill_manual(values=c("#cd3700", "#008b45"), 
-                    name="Household head is\nregistered member",
-                    breaks=c("No", "Yes"),
-                    labels=c("No", "Yes")) +
-  labs(title="Olkiramatian - How much influence do you feel this household\nhas in decision making in this Group Ranch",
-       x="Influence household has in decision making", y = "Number of Households") +
-  scale_y_continuous(breaks = seq(0,600, by = 200), limits = c(0,600)) +
-  theme_sjplot() #+
-#theme(legend.position=c(0.975,0.6)) 
-#geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
-
-
-###### proportions ######
-
-#Shompole
-ggplot(data = subset(b, group_ranch=="Shompole"), aes(x=hh_influence, y=proportion, group = gr_mem, fill = gr_mem)) +
-  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width=0.95) + 
-  #facet_grid(~group_ranch)+
-  geom_errorbar(data = subset(b, group_ranch=="Shompole"), aes(ymax = proportion_upp, ymin = proportion_low), 
-                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
-  #guides(fill=guide_legend(title=NULL)) +
-  scale_fill_manual(values=c("#cd3700", "#008b45"), 
-                    name="Household head is\nregistered member",
-                    breaks=c("No", "Yes"),
-                    labels=c("No", "Yes")) +
-  labs(title="Shompole - How much influence do you feel this household\nhas in decision making in this Group Ranch (2 ppl said they don't know)",
-       x="Influence household has in decision making", y = "Proportion of Households") +
-  scale_y_continuous(limits = c(0,1)) +
-  theme_sjplot() #+ 
-#theme(legend.position=c(0.975,0.6)) 
-#geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
-
-#Olkiramatian
-ggplot(data = subset(b, group_ranch=="Olkiramatian"), aes(x=hh_influence, y=proportion, group = gr_mem, fill = gr_mem)) +
-  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width=0.95) + 
-  #facet_grid(~group_ranch)+
-  geom_errorbar(data = subset(b, group_ranch=="Olkiramatian"), aes(ymax = proportion_upp, ymin = proportion_low), 
-                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
-  #guides(fill=guide_legend(title=NULL)) +
-  scale_fill_manual(values=c("#cd3700", "#008b45"), 
-                    name="Household head is\nregistered member",
-                    breaks=c("No", "Yes"),
-                    labels=c("No", "Yes")) +
-  labs(title="Olkiramatian - How much influence do you feel this household\nhas in decision making in this Group Ranch",
-       x="Influence household has in decision making", y = "Proportion of Households") +
-  scale_y_continuous(limits = c(0,1)) +
-  theme_sjplot() #+
-#theme(legend.position=c(0.975,0.6)) 
-#geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
-
-
-######################################################################################################################
-####### Survey based graph of proportion of HHS who believe there are rules about settlement and grazing
-######################################################################################################################
-
-#hhs$graz_law<-as.factor(hhs$graz_law)
-#hhs$set_rule_help<-as.factor(hhs$set_rule_help)
-hhs2 <- hhs %>% 
-  mutate(graz_law = fct_explicit_na(graz_law, "0")) %>% 
-  mutate(set_rule_help = fct_explicit_na(set_rule_help, "0")) %>% 
-  mutate(graz_law = fct_collapse(graz_law,
-                                 "There are no rules" = c("0"),
-                                 "Caused problems" = c("1","2"),
-                                 "Made no difference" = c("3"),
-                                 "Helped" = c("4","5"),
-                                 "Don't Know" = c("-99"))) %>% 
-  mutate(set_rule_help = fct_collapse(set_rule_help,
-                                      "There are no rules" = c("0"),
-                                      "Caused problems" = c("1","2"),
-                                      "Made no difference" = c("3"),
-                                      "Helped" = c("4","5"),
-                                      "Don't Know" = c("-99")))
-
-strat_design_srvyr_hhs <- hhs2 %>% 
-  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, loc_name, graz_law, set_rule_help)) %>% 
-  mutate(group_ranch = ifelse(loc_name %in% 3:4, "Shompole", "Olkiramatian"))
-
-c <- strat_design_srvyr_hhs %>% 
-  ### NOT NEEDED AS I RE FACTORED AND COMBINED ABOVE~~~ mutate(graz_law = factor(graz_law, levels = c(0,1,2,3,4,5,-99), labels=c("There are no rules","Brought many problems","Brought problems", "Made no difference", "Brought help", "Brought much help", "Don't know"))) %>% 
-  group_by(group_ranch, graz_law) %>% 
-  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-
-d <- strat_design_srvyr_hhs %>% 
-  ### NOT NEEDED AS I RE FACTORED AND COMBINED ABOVE~~~ mutate(set_rule_help = factor(set_rule_help, levels = c(0,1,2,3,4,5,-99), labels=c("There are no rules","Brought many problems","Brought problems", "Made no difference", "Brought help", "Brought much help", "Don't know"))) %>% 
-  group_by(group_ranch, set_rule_help) %>% 
-  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-
-ggplot(c, aes(x=group_ranch, y=proportion, group = graz_law, fill = graz_law)) +
+ggplot(a, aes(x=sample, y=proportion, group = wild_perception, fill = wild_perception)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
-  geom_errorbar(data = c, aes(ymax = proportion_upp, ymin = proportion_low), 
+  geom_errorbar(data=a, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
-  scale_fill_manual(values=c("#DFDFDF", "#008b45", "#cd3700", "tan3", "#6FAFCA"), 
-                    #name="Legend Title",
-                    breaks=c("Don't Know", "There are no rules","Caused problems", "Made no difference", "Helped"),
-                    labels=c("Don't Know", "There are no rules","Caused problems", "Made no difference", "Helped")) +
-  labs(title="For your household, the Group Ranch grazing management rules about dry season reserves have ...",
-       x="Group Ranch", y = "Proportion of Households") +
-  scale_y_continuous(limits=c(0, 1)) +
-  theme_sjplot()  
-#theme(legend.position=c(0.975,0.6)) 
-#geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
-
-ggplot(d, aes(x=group_ranch, y=proportion, group = set_rule_help, fill = set_rule_help)) +
-  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
-  geom_errorbar(data = d, aes(ymax = proportion_upp, ymin = proportion_low),
-                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
-  guides(fill=guide_legend(title=NULL)) +
-  scale_fill_manual(values=c("#DFDFDF", "#008b45", "#cd3700", "tan3", "#6FAFCA"), 
-                    #name="Legend Title",
-                    breaks=c("Don't Know", "There are no rules","Caused problems", "Made no difference", "Helped"),
-                    labels=c("Don't Know", "There are no rules","Caused problems", "Made no difference", "Helped")) +
-  labs(title="For your household, the Group Ranch rules about where people can settle have ...",
-       x="Group Ranch", y = "Proportion of Households") +
+#  scale_fill_manual(values=c("#008b45","#6FAFCA","yellow3", "tan3", "#cd3700", "#DFDFDF"), 
+#                    #name="Legend Title",
+#                    breaks=c("1","2","3", "4", "5", "6"),
+#                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+#                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer")) +
+  labs(title = "feel about the wildlife living here", x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
-  theme(legend.position=c(0.975,0.6)) 
+  theme(legend.position=c(0.4,0.9))
+ggsave(filename = here::here("images", "feel about the wildlife living here.png"))
 
 ############################################################################################################################################
 ############################################################################################################################################
@@ -608,7 +439,7 @@ ggplot(data=subset(cons_ms$variables, !is.na(wild_damage)), aes(x = dist_cons_ar
 # remove outliers; values that are less than the value at 1st percentile are 
 # replaced by the value at 1st percentile, and values that are greater than 
 # the value at 99th percentile are replaced by the value at 99th percentile.
-#hhs <- hhs %>% 
+#hhs2 <- hhs2 %>% 
 #  filter(cow_bef09 < quantile(cow_bef09, 0.99, na.rm = TRUE)) %>% 
 #  filter(cow_bef09 > quantile(cow_bef09, 0.01, na.rm = TRUE))
 
