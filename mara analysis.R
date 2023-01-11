@@ -7,6 +7,10 @@ library(stats)
 library(stats4)
 library(survey)
 library(srvyr, warn.conflicts = FALSE)
+library(sjPlot)
+ggsave <- function(..., bg = 'white') ggplot2::ggsave(..., bg = bg)
+
+
 # strat_design <- svydesign(id=~1, strata=~stype, fpc=~fpc, data=apistrat)
 # strat_design
 # svytotal(~enroll, strat_design)
@@ -39,15 +43,14 @@ hhs<-googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ptDKp9WY
 hhs$start <- lubridate::ymd_hms(hhs$start) # convert to date
 hhs$end <- lubridate::ymd_hms(hhs$end) # convert to date time
 
-as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, loc_name, roof, wall, mobil)) 
-
 hhs2 <- hhs %>% 
   mutate(elapsed = end-start) %>% 
-  rename(agreed = 8, m_child = 22, f_child = 23, m_adult = 24, f_adult = 25, sch_child = 26, int_phon = 27, norm_phon = 28, radio = 29, torch = 30, tv = 31, elec = 32, gen = 33, sola = 34, piki = 35, car = 36, 
-         table = 37, sofa = 38, lat = 39, mpesa = 40, bank = 41, fuel = 42, roof = 43, wall = 44, all_conserve = 47, conserve_lemek = 48, conserve_olchorro = 49, conserve_enonkishu = 50, conserve_mbokishi = 51, 
-         conserve_enarau = 52, conserve_other = 53, land_size = 58, activity_before1 = 63, activity_before2 = 65, activity_before3 = 66, activity_current1 = 72, activity_current2 = 73, activity_current3 = 74, 
-         cow_before = 85, sheep_before = 86, goat_before = 87, donkey_before = 88, cow_now = 90, sheep_now = 91, goat_now = 92, donkey_now = 93, crop_acre = 105, graz_hhcons = 114, cons_payment = 127,
-         hhnum_tourism = 128, wild_conf_cow = 140, wild_conf_shoat = 141, sample = 254) %>% # rename by index
+  rename(agreed = 8, gender = 17, edu = 20, m_child = 22, f_child = 23, m_adult = 24, f_adult = 25, sch_child = 26, int_phon = 27, norm_phon = 28, radio = 29, torch = 30, tv = 31, elec = 32, gen = 33, sola = 34, piki = 35, car = 36, 
+         table = 37, sofa = 38, lat = 39, mpesa = 40, bank = 41, fuel = 42, roof = 43, wall = 44, mobility = 45, all_conserve = 47, conserve_lemek = 48, conserve_olchorro = 49, conserve_enonkishu = 50, conserve_mbokishi = 51, 
+         conserve_enarau = 52, conserve_other = 53, land_size = 58, activity_before1 = 63, activity_before2 = 65, activity_before3 = 66, skip_meal_before = 67, wellbeing_before = 69, wellbeing_after = 70, activity_current1 = 72, activity_current2 = 73, activity_current3 = 74, 
+         skip_meal_after = 75, occupation = 77, access_edu = 79, access_elec = 80, access_water = 81, cow_before = 85, sheep_before = 86, goat_before = 87, donkey_before = 88, cow_now = 90, sheep_now = 91, goat_now = 92, donkey_now = 93, crop_yn = 104, crop_acre = 105, conserve_authority = 111, 
+         agree_before = 112, agree_now = 113, graz_hhcons = 114, graz_rules = 115, graz_rules_help = 116, settle_rules = 117, settle_rules_help = 118, forest_rules = 119, forest_rules_help = 120, water_rules = 121, water_rules_help = 122,
+         wildlife_rules =123, wildlife_rules_help = 124, receive_income = 125, cons_payment = 127, hhnum_tourism = 128, hhnum_conserve = 129, income_informed = 130, influence = 132, transparency = 133, accountability = 134, women_power = 135, wild_perception = 137, wild_conf_cow = 140, wild_conf_shoat = 141, sample = 254) %>% # rename by index
   mutate(id = row_number()) %>% 
   filter(agreed == "Yes") %>%
   mutate(
@@ -64,6 +67,14 @@ hhs2 <- hhs %>%
       sample == "Lemek" ~ 213,
       sample == "Ol Chorro" ~ 100,
       sample == "Outside" ~ 26)) %>% 
+  mutate(fpc1 = 414) %>% 
+  mutate(
+    pw = case_when(
+      sample == "Mbokishi" ~ 2.086957, # 23 sampled out of 48
+      sample == "Enonkishu" ~ 3, # 9 sampled out of 27
+      sample == "Lemek" ~ 3.380952, # 63 sampled out of 213
+      sample == "Ol Chorro" ~ 5.263158, # 19 sampled out of 100
+      sample == "Outside" ~ 2.363636)) %>% # 11 sampled out of 26
   mutate(more_conservancies = conserve_lemek + conserve_olchorro + conserve_enonkishu + conserve_mbokishi + conserve_enarau + conserve_other) %>% 
   mutate(cow_before = replace(cow_before, cow_before == -99, NA)) %>% 
   mutate(cow_now = replace(cow_now, cow_now == -99, NA)) %>% 
@@ -313,159 +324,227 @@ ggplot(hhs_wealth, aes(x=land_size_fct, y=wealth_pca)) +
 ############# Survey based household material and mobility ########
 ######################################################################################################################
 
-strat_design_srvyr_house <- hhs %>% 
-  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, loc_name, roof, wall, mobil)) %>% 
-  mutate(group_ranch = ifelse(loc_name %in% 3:4, "Shompole", "Olkiramatian"))
+strat_design_srvyr_house <- hhs_wealth %>% 
+  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, roof, wall, mobility, sample)) 
 #add weights=~pw to include weights which are      total in strata/number sampled in strata
 strat_design_srvyr_house
 
-each_gr_roof <- strat_design_srvyr_house %>% 
-  mutate(roof = replace(roof, roof<0, NA)) %>% 
-  mutate(roof = factor(roof, levels = c(1,2,3,4,5), 
-                       labels=c("Corrugated Iron", "Tiles", "Cement/Bricks", "Grass/Makuti", "Mud/Dung/Plastic"))) %>% 
-  group_by(group_ranch, roof) %>% 
+each_conserve_roof <- strat_design_srvyr_house %>% 
+  group_by(sample, roof) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             #total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n()))
 
-each_gr_wall <- strat_design_srvyr_house %>% 
-  mutate(wall = replace(wall, wall<0, NA)) %>% 
-  mutate(wall = factor(wall, levels = c(1,2,3,4,5, 6), 
-                       labels=c("Bricks with Cement", "Corrugated Iron", "Mud Bricks", "Stones/Mud", "Wood/Mud", "Grass/Makuti"))) %>% 
-  group_by(group_ranch, wall) %>% 
+each_conserve_wall <- strat_design_srvyr_house %>% 
+  group_by(sample, wall) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             #total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n()))
 
-each_gr_mobility <- strat_design_srvyr_house %>% 
-  mutate(mobil = replace(mobil, mobil<0, NA)) %>% 
-  mutate(mobil = factor(mobil, levels = c(1,2,3), 
-                        labels=c("None", "Partial", "Whole"))) %>% 
-  group_by(group_ranch, mobil) %>% 
+each_conserve_mobility <- strat_design_srvyr_house %>% 
+  #mutate(mobility = factor(mobility, levels = c(1,2,3), 
+  #                      labels=c("None", "Partial", "Whole"))) %>%  
+  group_by(sample, mobility) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             #total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n()))
+
+ggplot(each_conserve_mobility, aes(x=sample, y=proportion, group = mobility, fill = mobility)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=each_conserve_mobility, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#D091BB", "#BBD4A6", "#DFDFDF"), 
+                    #name="Legend Title",
+                    breaks=c("None", "Livestock only move", "I do not want to answer"),
+                    labels=c("None", "Livestock only move", "I do not want to answer")) +
+  labs(title="Level of household mobility",x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 1)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.62,0.9))
+ggsave(filename = here::here("images", "level of mobility.png"))
 
 ######################################################################################################################
 ############# Survey based household education level reached  ############
 ######################################################################################################################
 
-strat_design_srvyr_edu <- hhs %>% 
-  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, loc_name, edu)) %>% 
-  mutate(group_ranch = ifelse(loc_name %in% 3:4, "Shompole", "Olkiramatian"))
+strat_design_srvyr_edu <- hhs_wealth %>% 
+  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, sample, edu))
 #add weights=~pw to include weights which are      total in strata/number sampled in strata
 strat_design_srvyr_edu
 
-each_gr_edu <- strat_design_srvyr_edu %>% 
-  mutate(edu = replace(edu, edu<0, NA)) %>% 
-  mutate(edu = factor(edu, levels = c(1,2,3,4,5,6), 
-                      labels=c("None", "Adult Literacy", "Primary", "Secondary", "Diploma", "Degree"))) %>% 
-  group_by(group_ranch, edu) %>% 
+each_conserve_edu <- strat_design_srvyr_edu %>% 
+  group_by(sample, edu) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             #total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n()))
+
+ggplot(each_conserve_edu, aes(x=sample, y=proportion, group = edu, fill = edu)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=each_conserve_edu, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#F5B7B1", "#D091BB", "#A9CCE3", "#BBD4A6", "#FAD7A0", "#2E86C1", "#DFDFDF"), 
+                    #name="Legend Title",
+                    breaks=c("None", "Adult literacy classes (Gumbaru)", "Primary", "Secondary", "Diploma", "Degree", "I do not want to answer"),
+                    labels=c("None", "Adult literacy classes (Gumbaru)", "Primary", "Secondary", "Diploma", "Degree", "I do not want to answer")) +
+  labs(title="Level of education completed",x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 1)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.67,0.8))
+ggsave(filename = here::here("images", "level of education completed.png"))
 
 ######################################################################################################################
 ############# Survey based household assets  ##############
 ######################################################################################################################
 
-strat_design_srvyr_asset <- hhs %>% 
-  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, loc_name, int_phon, norm_phon, radio, torch, tv, sola, piki, car, lat)) %>% 
-  mutate(group_ranch = ifelse(loc_name %in% 3:4, "Shompole", "Olkiramatian"))
+strat_design_srvyr_asset <- hhs_wealth %>% 
+  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, int_phon.y, sample)) 
 #add weights=~pw to include weights which are      total in strata/number sampled in strata
 strat_design_srvyr_asset 
 
 ####for each asset ####
-each_gr_int_phon <- strat_design_srvyr_asset %>% 
-  mutate(int_phon = replace(int_phon, int_phon<0, NA)) %>% 
-  mutate(int_phon = factor(int_phon, levels = c(0,1), 
-                           labels=c("No", "Yes"))) %>% 
-  group_by(group_ranch, int_phon) %>% 
+each_conserve_int_phon <- strat_design_srvyr_asset %>% 
+  group_by(sample, int_phon.y) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            #total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  mutate(int_phon.y=recode(int_phon.y,
+                     "0" = "No",
+                     "1" = "Yes"))
+  
+ggplot(each_conserve_int_phon, aes(x=sample, y=proportion, group = int_phon.y, fill = int_phon.y)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=each_conserve_int_phon, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#D091BB", "#BBD4A6"), 
+                    #name="Legend Title",
+                    breaks=c("No", "Yes"),
+                    labels=c("No", "Yes")) +
+  labs(title="Own a smart phone",x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 1)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.5,0.8))
+ggsave(filename = here::here("images", "smartphone ownership.png"))
+
+######################################################################################################################
+############# Survey based gender of land title holder  ##############
+######################################################################################################################
+
+strat_design_srvyr_gender <- hhs_wealth %>% 
+  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, gender, sample)) 
+#add weights=~pw to include weights which are      total in strata/number sampled in strata
+
+####for each asset ####
+each_conserve_gender <- strat_design_srvyr_gender %>% 
+  group_by(sample, gender) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             #total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n()))
-view(each_gr_norm_phon)
 
-each_gr_norm_phon <- strat_design_srvyr_asset %>% 
-  mutate(norm_phon = replace(norm_phon, norm_phon<0, NA)) %>% 
-  mutate(norm_phon = factor(norm_phon, levels = c(0,1), 
-                            labels=c("No", "Yes"))) %>% 
-  group_by(group_ranch, norm_phon) %>% 
+ggplot(each_conserve_gender, aes(x=sample, y=proportion, group = gender, fill = gender)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=each_conserve_gender, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#D091BB", "#BBD4A6"), 
+                    #name="Legend Title",
+                    breaks=c("Female", "Male"),
+                    labels=c("Female", "Male")) +
+  labs(title="Gender of land title holder", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 1)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.75,0.96))
+ggsave(filename = here::here("images", "Gender of land title holder.png"))
+
+
+######################################################################################################################
+######## Survey based graph of proportion of HHS who agreed with setting up the cons area at the time and now ########
+######################################################################################################################
+
+hhs <- hhs %>% 
+  mutate(cons_yn1 = as.numeric(cons_yn1))
+
+strat_design_srvyr_hhs <- hhs_wealth %>% 
+  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, sample, agree_before, agree_now))
+
+a_before <- strat_design_srvyr_hhs %>% 
+  mutate(agree_before = factor(agree_before, levels = c("No", "Yes", "<i>Don't Know</i>", NA), labels=c("No", "Yes", "Don't Know"))) %>% 
+  group_by(sample, agree_before) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-view(each_gr_norm_phon)
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  na.omit()
 
-each_gr_radio <- strat_design_srvyr_asset %>% 
-  mutate(radio = replace(radio, radio<0, NA)) %>% 
-  mutate(radio = factor(radio, levels = c(0,1), 
-                        labels=c("No", "Yes"))) %>% 
-  group_by(group_ranch, radio) %>% 
+ggplot(a_before, aes(x=sample, y=proportion, group = agree_before, fill = agree_before)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=a_before, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#D091BB", "#BBD4A6", "#DFDFDF", "#DFDFDF"), 
+                    #name="Legend Title",
+                    breaks=c("No", "Yes", "<i>Don't Know</i>", "NA"),
+                    labels=c("No", "Yes", "<i>Don't Know</i>", "NA")) +
+  labs(title="cons agree before (NA omitted)",x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 1)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.9,0.6))
+ggsave(filename = here::here("images", "agreed_with_cons_before.png"))
+
+a_now <- strat_design_srvyr_hhs %>% 
+  mutate(agree_now = factor(agree_now, levels = c("No", "Yes", "<i>Don't Know</i>", NA), labels=c("No", "Yes", "Don't Know"))) %>% 
+  group_by(sample, agree_now) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-view(each_gr_radio)
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  na.omit()
 
-each_gr_torch <- strat_design_srvyr_asset %>% 
-  mutate(torch = replace(torch, torch<0, NA)) %>% 
-  mutate(torch = factor(torch, levels = c(0,1), 
-                        labels=c("No", "Yes"))) %>% 
-  group_by(group_ranch, torch) %>% 
+ggplot(a_now, aes(x=sample, y=proportion, group = agree_now, fill = agree_now)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=a_now, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#D091BB", "#BBD4A6", "#DFDFDF", "#DFDFDF"), 
+                    #name="Legend Title",
+                    breaks=c("No", "Yes", "<i>Don't Know</i>", "NA"),
+                    labels=c("No", "Yes", "<i>Don't Know</i>", "NA")) +
+  labs(title="cons agree now (NA omitted)",x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 1)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.9,0.6))
+ggsave(filename = here::here("images", "agreed_with_cons_now.png"))
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and who they think own the conservation area  ########
+######################################################################################################################
+
+strat_design_srvyr_hhs <- hhs %>% 
+  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, loc_name, cons_owner)) %>% 
+  mutate(group_ranch = ifelse(loc_name %in% 3:4, "Shompole", "Olkiramatian"))
+
+c <- strat_design_srvyr_hhs %>% 
+  mutate(cons_owner = factor(cons_owner, levels = c(1,2,3,4,5,-99), labels=c("Group Ranch members","KWS","Tourism Operator", "Conservation Committee", "Group Ranch Committee", "Don't Know"))) %>% 
+  group_by(group_ranch, cons_owner) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            #total = survey_total(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n()))
-view(each_gr_torch)
 
-each_gr_tv <- strat_design_srvyr_asset %>% 
-  mutate(tv = replace(tv, tv<0, NA)) %>% 
-  mutate(tv = factor(tv, levels = c(0,1), 
-                     labels=c("No", "Yes"))) %>% 
-  group_by(group_ranch, tv) %>% 
-  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-view(each_gr_tv)
+ggplot(c, aes(x=group_ranch, y=proportion, group = cons_owner, fill = cons_owner)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=c, aes(ymax = proportion_upp, ymin = proportion_low), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#008b45", "#cd3700", "tan3", "yellow3","#6FAFCA", "#DFDFDF"), 
+                    #name="Legend Title",
+                    breaks=c("Group Ranch members","KWS","Tourism Operator", "Conservation Committee", "Group Ranch Committee", "Don't Know"),
+                    labels=c("Group Ranch members","KWS","Tourism Operator", "Conservation Committee", "Group Ranch Committee", "Don't Know")) +
+  labs(x="Group Ranch", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 1)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.9,0.8))
 
-each_gr_sola <- strat_design_srvyr_asset %>% 
-  mutate(sola = replace(sola, sola<0, NA)) %>% 
-  mutate(sola = factor(sola, levels = c(0,1), 
-                       labels=c("No", "Yes"))) %>% 
-  group_by(group_ranch, sola) %>% 
-  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-view(each_gr_sola)
-
-each_gr_piki <- strat_design_srvyr_asset %>% 
-  mutate(piki = replace(piki, piki<0, NA)) %>% 
-  mutate(piki = factor(piki, levels = c(0,1), 
-                       labels=c("No", "Yes"))) %>% 
-  group_by(group_ranch, piki) %>% 
-  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-view(each_gr_piki)
-
-each_gr_car <- strat_design_srvyr_asset %>% 
-  mutate(car = replace(car, car<0, NA)) %>% 
-  mutate(car = factor(car, levels = c(0,1), 
-                      labels=c("No", "Yes"))) %>% 
-  group_by(group_ranch, car) %>% 
-  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-view(each_gr_car)
-
-each_gr_lat <- strat_design_srvyr_asset %>% 
-  mutate(lat = replace(lat, lat<0, NA)) %>% 
-  mutate(lat = factor(lat, levels = c(0,1), 
-                      labels=c("No", "Yes"))) %>% 
-  group_by(group_ranch, lat) %>% 
-  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-view(each_gr_lat)
-
+#geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
 ############################################################################################################################################
 ############################################################################################################################################
 # model of cons support vs wealth
