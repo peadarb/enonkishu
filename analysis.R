@@ -1,4 +1,3 @@
-rm(list=ls())
 library(tidyverse)
 library(lubridate)
 library(scales)
@@ -10,314 +9,14 @@ library(srvyr, warn.conflicts = FALSE)
 library(sjPlot)
 ggsave <- function(..., bg = 'white') ggplot2::ggsave(..., bg = bg)
 
-
-# strat_design <- svydesign(id=~1, strata=~stype, fpc=~fpc, data=apistrat)
-# strat_design
-# svytotal(~enroll, strat_design)
-# svymean(~enroll, strat_design)
-# svytotal(~stype, strat_design)
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-############################################################################################################
-######### development information from household survey
-############################################################################################################
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+######################################################################################################################
+####### import cleaned household survey data with wealth index
+######################################################################################################################
 
 rm(list=ls())
-# bring in sheet ----------------------------------------------------------
-hhs<-googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ptDKp9WYxro3W_JmKIcP2fohHkN9av1Tt6ZkDyl9MRo/edit#gid=1677543214") %>% 
-  as.data.frame()
-######################################################################################################################
-####### run data cleaning code for household survey
-######################################################################################################################
-#  -99 indicates don't know and these are converted to NA in continuous or "Don't know" in categorical   #######
 
-########################################################
-# set all data types correctly before importation
-########################################################
-
-########################################################
-# need to sort out the cow issue
-########################################################
-
-hhs$start <- lubridate::ymd_hms(hhs$start) # convert to date
-hhs$end <- lubridate::ymd_hms(hhs$end) # convert to date time
-
-hhs2 <- hhs %>% 
-  mutate(elapsed = end-start) %>% 
-  rename(agreed = 8, gender = 17, edu = 20, m_child = 22, f_child = 23, m_adult = 24, f_adult = 25, sch_child = 26, int_phon = 27, norm_phon = 28, radio = 29, torch = 30, tv = 31, elec = 32, gen = 33, sola = 34, piki = 35, car = 36, 
-         table = 37, sofa = 38, lat = 39, mpesa = 40, bank = 41, fuel = 42, roof = 43, wall = 44, mobility = 45, all_conserve = 47, conserve_lemek = 48, conserve_olchorro = 49, conserve_enonkishu = 50, conserve_mbokishi = 51, 
-         conserve_enarau = 52, conserve_other = 53, land_size = 58, activity_before1 = 63, activity_before2 = 65, activity_before3 = 66, skip_meal_before = 67, wellbeing_before = 69, wellbeing_after = 70, activity_current1 = 72, activity_current2 = 73, activity_current3 = 74, 
-         skip_meal_after = 75, occupation = 77, access_edu = 79, access_elec = 80, access_water = 81, cow_before = 85, sheep_before = 86, goat_before = 87, donkey_before = 88, cow_now = 90, sheep_now = 91, goat_now = 92, donkey_now = 93, crop_yn = 104, crop_acre = 105, conserve_authority = 111, 
-         agree_before = 112, agree_now = 113, graz_hhcons = 114, graz_rules = 115, graz_rules_help = 116, settle_rules = 117, settle_rules_help = 118, forest_rules = 119, forest_rules_help = 120, water_rules = 121, water_rules_help = 122,
-         wildlife_rules =123, wildlife_rules_help = 124, receive_income = 125, cons_payment = 127, hhnum_tourism = 128, hhnum_conserve = 129, income_informed = 130, influence = 132, transparency = 133, accountability = 134, women_power = 135, wild_perception = 137, wild_conf_cow = 140, wild_conf_shoat = 141, sample = 254) %>% # rename by index
-  mutate(id = row_number()) %>% 
-  filter(agreed == "Yes") %>%
-  mutate(
-    stype = case_when(
-      sample == "Mbokishi" ~ "mbo",
-      sample == "Enonkishu" ~ "enon",
-      sample == "Lemek" ~ "lem",
-      sample == "Ol Chorro" ~ "chor",
-      sample == "Outside" ~ "out")) %>% 
-  mutate(
-    fpc = case_when(
-      sample == "Mbokishi" ~ 48,
-      sample == "Enonkishu" ~ 27,
-      sample == "Lemek" ~ 213,
-      sample == "Ol Chorro" ~ 100,
-      sample == "Outside" ~ 26)) %>% 
-  mutate(fpc1 = 414) %>% 
-  mutate(
-    pw = case_when(
-      sample == "Mbokishi" ~ 2.086957, # 23 sampled out of 48
-      sample == "Enonkishu" ~ 3, # 9 sampled out of 27
-      sample == "Lemek" ~ 3.380952, # 63 sampled out of 213
-      sample == "Ol Chorro" ~ 5.263158, # 19 sampled out of 100
-      sample == "Outside" ~ 2.363636)) %>% # 11 sampled out of 26
-  mutate(more_conservancies = conserve_lemek + conserve_olchorro + conserve_enonkishu + conserve_mbokishi + conserve_enarau + conserve_other) %>% 
-  mutate(cow_before = replace(cow_before, cow_before == -99, NA)) %>% 
-  mutate(cow_now = replace(cow_now, cow_now == -99, NA)) %>% 
-  mutate(sheep_before = replace(sheep_before, sheep_before == -99, NA)) %>% 
-  mutate(sheep_now = replace(sheep_now, sheep_now == -99, NA)) %>% 
-  mutate(goat_before = replace(goat_before, goat_before == -99, NA)) %>% 
-  mutate(goat_now = replace(goat_now, goat_now == -99, NA)) %>% 
-  mutate(donkey_before = replace(donkey_before, donkey_before == -99, NA)) %>% 
-  mutate(donkey_now = replace(donkey_now, donkey_now == -99, NA)) %>% 
-  mutate(cow_before_tlu = cow_before*0.71) %>% #based on Grandin 1988
-  mutate(cow_now_tlu = cow_now*0.71) %>%   #based on Grandin 1988
-  mutate(sheep_before_tlu = sheep_before*0.17) %>% #based on Grandin 1988
-  mutate(sheep_now_tlu = sheep_now*0.17) %>% #based on Grandin 1988
-  mutate(goat_before_tlu = goat_before*0.17) %>% #based on Grandin 1988
-  mutate(goat_now_tlu = goat_now*0.17) %>% #based on Grandin 1988
-  mutate(total_before_tlu = cow_before_tlu+sheep_before_tlu+goat_before_tlu) %>% 
-  mutate(total_now_tlu = cow_now_tlu+sheep_now_tlu+goat_now_tlu) %>% 
-  mutate(crop_acre = if_else(is.na(crop_acre), 0, crop_acre)) %>% #there were no -99s here 
-  mutate(ppl_in_hh = m_child + f_child + m_adult + f_adult+1) %>% #don't include themselves
-  mutate(tlu_per_person = total_now_tlu/ppl_in_hh) %>% 
-  mutate(perc_child_in_edu = sch_child/ppl_in_hh) %>%  # N.B. this does not give true indication as it includes adults 
-  mutate(graze_cons = fct_recode(graz_hhcons, "1" = "Always", "1" = "Often","1" = "Sometimes", "1" = "Rarely", "0" = "Never")) %>%  # graze in cons area yes or no 
-  mutate(land_size_fct = fct_recode(land_size, "1" = "Less than 10 acres", "2" = "Between 10 and 20 acres", "3" = "Between 20 and 30 acres", 
-                                 "4" = "Over 30 acres", NULL = "I do not want to answer")) %>%  # graze in cons area yes or no 
-  mutate(land_size_fct = fct_inseq(land_size_fct)) %>% 
-  mutate(cons_payment_fct = fct_recode(cons_payment, "1" = "0 – KES 50,000", "2" = "KES 50,001 – KES 100,000","3" = "KES100,001 – KES 150,000", 
-                                       "4" = "KES 150,001 – KES 200,000", "5" = "KES 200,001 – KES 250,000", "6" = "KES 250,000+", NULL = "I do not want to answer")) %>%  # graze in cons area yes or no 
-  mutate(cons_payment_fct = fct_inseq(cons_payment_fct)) %>% 
-  mutate(hwc_cow_tlu = wild_conf_cow*0.71) %>% #NO -99 in data - tlu based on Grandin 1988)
-  mutate(hwc_shoat_tlu = wild_conf_shoat*0.17) %>% #NO -99 in data - tlu based on Grandin 1988)
-  mutate(hwc_total_tlu = hwc_cow_tlu + hwc_shoat_tlu) %>% 
-  mutate(activity_current1 = as.factor(activity_current1)) %>%  
-  mutate(activity_current1 = fct_collapse(activity_current1,
-                                          "Conservancy" = c("Conservancy land access payment"),
-                                          "Cultivation" = c("Cultivation"),
-                                          "Livestock" = c("Livestock and related products"),
-                                          "Tourism" = c("Tourism related employment"),
-                                          "Employed" = c("Other skilled or permanent employment", "Government Employment"),
-                                          "Own business" = c("Own business"),
-                                          "None" = c("None"),
-                                          "Refused" = c("I do not want to answer"))) %>% 
-  mutate(activity_current2 = as.factor(activity_current2)) %>%  
-  mutate(activity_current2 = fct_collapse(activity_current2,
-                                          "Conservancy" = c("Conservancy land access payment"),
-                                          "Cultivation" = c("Cultivation"),
-                                          "Livestock" = c("Livestock and related products"),
-                                          "Tourism" = c("Tourism related employment"),
-                                          "Employed" = c("Other skilled or permanent employment"),
-                                          "Dependent" = c("Cash remittances"),
-                                          "Loans or credit" = c("Loans or credit"),
-                                          "Own business" = c("Own business"),
-                                          "None" = c("None"))) %>% 
-  mutate(activity_current3 = as.factor(activity_current3)) %>%  
-  mutate(activity_current3 = fct_collapse(activity_current3,
-                                           "Conservancy" = c("Conservancy land access payment"),
-                                           "Cultivation" = c("Cultivation"),
-                                           "Livestock" = c("Livestock and related products"),
-                                           "Tourism" = c("Tourism related employment"),
-                                           "Employed" = c("Other skilled or permanent employment", "Government Employment"),
-                                           "Dependent" = c("Cash remittances", "Food aid"),
-                                           "Loans or credit" = c("Loans or credit"),
-                                           "Own business" = c("Own business"),
-                                           "Other" = c("Kibarua or short-term employment (includes working for someone as bodaboda driver or herder)"),
-                                           "None" = c("None"))) %>% 
-  mutate(activity_before1 = as.factor(activity_before1)) %>%  
-  mutate(activity_before1 = fct_collapse(activity_before1,
-                                         "Cultivation" = c("Cultivation"),
-                                          "Livestock" = c("Livestock and related products"),
-                                          "Tourism" = c("Tourism related employment"),
-                                          "Employed" = c("Other skilled or permanent employment"),
-                                          "Own business" = c("Own business"),
-                                          "None" = c("None"))) %>% 
-  mutate(activity_before2 = as.factor(activity_before2)) %>%  
-  mutate(activity_before2 = fct_collapse(activity_before2,
-                                          "Conservancy" = c("Conservancy land access payment"),
-                                          "Cultivation" = c("Cultivation"),
-                                          "Livestock" = c("Livestock and related products"),
-                                          "Tourism" = c("Tourism related employment"),
-                                          "Employed" = c("Other skilled or permanent employment", "Government Employment"),
-                                          "Dependent" = c("Cash remittances"),
-                                          "Own business" = c("Own business"),
-                                          "Other" = c("Kibarua or short-term employment (includes working for someone as bodaboda driver or herder)"),
-                                          "None" = c("None"))) %>% 
-  mutate(activity_before3 = as.factor(activity_before3)) %>%  
-  mutate(activity_before3 = fct_collapse(activity_before3,
-                                           "Conservancy" = c("Conservancy land access payment"),
-                                           "Cultivation" = c("Cultivation"),
-                                           "Livestock" = c("Livestock and related products"),
-                                           "Tourism" = c("Tourism related employment"),
-                                           "Employed" = c("Other skilled or permanent employment", "Government Employment"),
-                                           "Dependent" = c("Cash remittances"),
-                                           "Loans or credit" = c("Loans or credit"),
-                                           "Own business" = c("Own business"),
-                                           "Other" = c("Kibarua or short-term employment (includes working for someone as bodaboda driver or herder)"),
-                                           "None" = c("None")))
-
-
-#######################################################################################################################
-###### constructing wealth index #####
-#######################################################################################################################
-
-# 1. exploratory data analysis of variables to potentially use in PCA ######
-hhs_pca_eda <- hhs2 %>% 
-  select(id, int_phon, norm_phon, radio, torch, tv, elec, gen, sola, piki, car, table, sofa, lat, mpesa, bank, fuel, 
-         roof, wall, land_size, cow_now_tlu, sheep_now_tlu, goat_now_tlu, total_now_tlu, crop_acre, more_conservancies) %>% 
-  mutate(int_phon = ifelse(int_phon == "Yes", 1, 0)) %>% 
-  mutate(norm_phon = ifelse(norm_phon == "Yes", 1, 0)) %>% 
-  mutate(radio = ifelse(radio == "Yes", 1, 0)) %>% 
-  mutate(torch = ifelse(torch == "Yes", 1, 0)) %>% 
-  mutate(tv = ifelse(tv == "Yes", 1, 0)) %>% 
-  mutate(elec = ifelse(elec == "Yes", 1, 0)) %>% 
-  mutate(gen = ifelse(gen == "Yes", 1, 0)) %>% 
-  mutate(sola = ifelse(sola == "Yes", 1, 0)) %>% 
-  mutate(piki = ifelse(piki == "Yes", 1, 0)) %>% 
-  mutate(car = ifelse(car == "Yes", 1, 0)) %>% 
-  mutate(table = ifelse(table == "Yes", 1, 0)) %>% 
-  mutate(sofa = ifelse(sofa == "Yes", 1, 0)) %>% 
-  mutate(lat = ifelse(lat == "Yes", 1, 0)) %>% 
-  mutate(mpesa = ifelse(mpesa == "Yes", 1, 0)) %>% 
-  mutate(bank = ifelse(bank == "Yes", 1, 0)) %>% 
-  mutate(gas_fuel = ifelse(fuel == "Gas", 1, 0)) %>% 
-  mutate(cement_brick_iron_roof = ifelse(roof == "Corrugated Iron" | roof == "Cement/Bricks", 1, 0)) %>% 
-  mutate(brick_cement_wall = ifelse(wall == "Bricks (or mud bricks) with Cement (Durable)", 1, 0)) %>% 
-  mutate(large_land_size = ifelse(land_size == "Over 30 acres", 1, 0)) %>% 
-  mutate(more_conservancies_binary= ifelse(more_conservancies > 1, 1, 0)) %>% 
-  select(!c(fuel, roof, wall, land_size))
-#change outliers to NA for total TLU and crop area
-#hhs_pca_eda$total_tlu[hhs_pca_eda$total_tlu > quantile(hhs_pca_eda$total_tlu, 0.99, na.rm = T)] <- NA
-#hhs_pca_eda$crop_acre[hhs_pca_eda$crop_acre > quantile(hhs_pca_eda$crop_acre, 0.99, na.rm = T)] <- NA
-
-# 2. Select all the subset of variables to be used to construct the PCA and omit all NA
-# this one contains all the ones possible including some continuous variables
-# could remove large land size as this has a number of NAs
-hhs_pca_eda_subset_all <- hhs_pca_eda %>% 
-  select(!c(more_conservancies, large_land_size, total_now_tlu, cow_now_tlu, sheep_now_tlu, goat_now_tlu, crop_acre, more_conservancies_binary)) %>% 
-  na.omit()
-
-### for all, checked all scaling and centering and both scaling and centering are needed - means it is a correlation matrix
-hhs_pca_all <- prcomp(hhs_pca_eda_subset_all, center = TRUE, scale = TRUE)
-summary(hhs_pca_all)
-biplot(hhs_pca_all, main = "All variables with centering and scaling")
-
-
-# check out the loading scores for this data
-loading_scores <- hhs_pca_all$rotation[,1]
-w_score <- abs(loading_scores)
-w_score_ranked <- sort(w_score, decreasing = TRUE) # sort them so we can just take out the most influention ones
-top_10_scores <- names(w_score_ranked[1:10]) # show the most influential ones
-top_10_scores
-hhs_pca_all$rotation[top_10_scores,1] # show the associated scores for the most valuable ones
-
-
-
-# 3. check for correlations between wealth indicators and explore data #########
-library(corrr)
-# using here() create a new folder in the Here() path location, called images
-dir.create(here::here("images"))
-
-cor_asset <- hhs_pca_eda_subset_all %>% 
-  #replace(is.na(.),0) %>% 
-  glimpse
-cor_asset %>% 
-  corrr::correlate() %>% 
-  corrr::shave() %>% 
-  corrr::fashion() %>% 
-  readr::write_excel_csv(here::here("correlation_matrix.csv"))
-
-cor_asset %>% 
-  corrr::correlate() %>% 
-  corrr::rearrange(method = "HC", absolute = FALSE) %>% 
-  corrr:::shave() %>% 
-  corrr::rplot(shape=19, colors = c("red", "green")) %>% 
-  ggplot2::ggsave(
-    filename = here::here("images", "correlation of assets.png"), 
-    width = 20, 
-    height = 5)
-
-#boxplot of all the variables with red cross at mean 
-plot <- hhs_pca_eda_subset_all %>% 
-  select(-id)
-ggplot(stack(plot), aes(x = reorder(ind, values, FUN = mean), y = values)) + 
-  geom_boxplot(notch = TRUE) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  stat_summary(fun.y = "mean", geom = "point", size = 5, color = "red", shape = 3) +
-  stat_summary(fun.y = "median", geom = "point", size = 5, color = "blue", shape = 3)
-
-#### for binary variables, checked all scaling and centering and only centering needed - means it is a covariance matrix 
-hhs_pca_binary <- prcomp(plot, center = TRUE, scale = FALSE)
-summary(hhs_pca_binary)
-biplot(hhs_pca_binary, main = "Binary variables with centering and NO scaling")
-
-# from Vyas and Kumaranayake 2006 standard procedure is to select components where the associated eigenvalue is greater than 1
-# only the first principal component is then used to measure wealth.
-
-library(factoextra)
-dev.off()
-fviz_pca_var(hhs_pca_binary,
-             col.var = "contrib", # Color by contributions to the PC
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-             repel = TRUE)     # Avoid text overlapping
-
-# in this case we will drop non binary and non influential variables: crop_acre, more_conservancies, sheep_now_tlu, goat_now_tlu, cow_now_tlu, total_now_tlu
-
-# 4. constructing PCA ######
-# if the data have been standardised (e.g. all binary) then use a co-variance matrix for the PCA
-# if the data have not been standardised (e.g. some quant data as well as binary), they use the correlation matrix
-
-# construct index of principal components
-index_all = hhs_pca_binary$x[,1]
-nlab<-c(1,2,3,4,5)
-
-# 5. append the index, and the wealth quintiles from all (with tlu and crop area) onto the full hhs dataframe
-hhs_pca_eda_subset_all <- hhs_pca_eda_subset_all %>% 
-  mutate(quintiles = as.factor(cut(index_all, breaks=5, labels=nlab))) %>% 
-  mutate(wealth_pca = index_all) 
-
-hhs_wealth <- full_join(hhs2, hhs_pca_eda_subset_all, by = "id")
-
-#write_csv(hhs, "C:/Users/peada/Documents/PhD/Research/4_data/2_analysis/hhsurvey/1_raw/hhs_cleaned.csv")
-saveRDS(hhs_wealth, "hhs_cleaned_wealth.rds")
-
-
-
-########################################################################################################################
-######## Test the wealth index by comparing to other variables
-########################################################################################################################
-
-# compare to payments from conservancies, land elsewhere, other?
-
-# bar chart of the quintiles against the variable of choice
-ggplot(hhs_wealth, aes(x=total_now_tlu)) + 
-  geom_point(aes(fill = quintiles), position = "fill",width = 0.4) +
-  xlab("TLU") +
-  ylab("Percentage") +
-  ggtitle("Wealth Breakdown with crop and tlu")
-
-# scatterplot with a linear model best fit line
-ggplot(hhs_wealth, aes(x=land_size_fct, y=wealth_pca)) +
-  geom_point() +
-  geom_smooth(method='lm') +
-  xlab("crop_acre") +
-  ylab("Wealth PCA") +
-  ggtitle("perc_child_in_edu vs wealth PCA")
+hhs_wealth <- readRDS("hhs_cleaned_wealth.rds")
+head(hhs_wealth)
 
 
 ######################################################################################################################
@@ -463,9 +162,6 @@ ggsave(filename = here::here("images", "Gender of land title holder.png"))
 ######## Survey based graph of proportion of HHS who agreed with setting up the cons area at the time and now ########
 ######################################################################################################################
 
-hhs <- hhs %>% 
-  mutate(cons_yn1 = as.numeric(cons_yn1))
-
 strat_design_srvyr_hhs <- hhs_wealth %>% 
   as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, sample, agree_before, agree_now))
 
@@ -515,6 +211,10 @@ ggplot(a_now, aes(x=sample, y=proportion, group = agree_now, fill = agree_now)) 
   theme(legend.position=c(0.9,0.6))
 ggsave(filename = here::here("images", "agreed_with_cons_now.png"))
 
+#####################
+# here
+###################
+
 #######################################################################################################################
 ####### Survey based graph of proportion of HHS and who they think own the conservation area  ########
 ######################################################################################################################
@@ -544,7 +244,178 @@ ggplot(c, aes(x=group_ranch, y=proportion, group = cons_owner, fill = cons_owner
   theme_sjplot() + 
   theme(legend.position=c(0.9,0.8))
 
+
+
+######################################################################################################################
+####### Survey based graph of proportion of HHS who believe their household has an influence in GR decision making 
+######################################################################################################################
+
+
+strat_design_srvyr_hhs <- hhs %>% 
+  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, loc_name, hh_influence, gr_mem)) %>% 
+  mutate(group_ranch = ifelse(loc_name %in% 3:4, "Shompole", "Olkiramatian"))
+
+###### totals ######
+
+b <- strat_design_srvyr_hhs %>% 
+  mutate(hh_influence = na_if(hh_influence, "-99")) %>% 
+  mutate(hh_influence = factor(hh_influence, levels = c(1,2,3,-99), labels=c("No influence","A little influence","A lot of influence", "Don't know"))) %>% 
+  #mutate(hh_influence = replace(hh_influence, hh_influence=c("Don't Know"), NA)) %>% 
+  mutate(gr_mem = replace(gr_mem, gr_mem<0, NA)) %>% 
+  mutate(gr_mem = factor(gr_mem, levels = c(0,1,-99), labels=c("No","Yes", NA))) %>% 
+  group_by(group_ranch, hh_influence, gr_mem) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  drop_na()
+
+#Shompole
+ggplot(data = subset(b, group_ranch=="Shompole"), aes(x=hh_influence, y=total, group = gr_mem, fill = gr_mem)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width=0.95) + 
+  #facet_grid(~group_ranch)+
+  geom_errorbar(data = subset(b, group_ranch=="Shompole"), aes(ymax = total_upp, ymin = total_low), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  #guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#cd3700", "#008b45"), 
+                    name="Household head is\nregistered member",
+                    breaks=c("No", "Yes"),
+                    labels=c("No", "Yes")) +
+  labs(title="Shompole - How much influence do you feel this household\nhas in decision making in this Group Ranch (2 ppl said they don't know)",
+       x="Influence household has in decision making", y = "Number of Households") +
+  scale_y_continuous(breaks = seq(0,1000, by = 200), limits = c(0,1000)) +
+  theme_sjplot() #+ 
+#theme(legend.position=c(0.975,0.6)) 
 #geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
+
+#Olkiramatian
+ggplot(data = subset(b, group_ranch=="Olkiramatian"), aes(x=hh_influence, y=total, group = gr_mem, fill = gr_mem)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width=0.95) + 
+  #facet_grid(~group_ranch)+
+  geom_errorbar(data = subset(b, group_ranch=="Olkiramatian"), aes(ymax = total_upp, ymin = total_low), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  #guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#cd3700", "#008b45"), 
+                    name="Household head is\nregistered member",
+                    breaks=c("No", "Yes"),
+                    labels=c("No", "Yes")) +
+  labs(title="Olkiramatian - How much influence do you feel this household\nhas in decision making in this Group Ranch",
+       x="Influence household has in decision making", y = "Number of Households") +
+  scale_y_continuous(breaks = seq(0,600, by = 200), limits = c(0,600)) +
+  theme_sjplot() #+
+#theme(legend.position=c(0.975,0.6)) 
+#geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
+
+
+###### proportions ######
+
+#Shompole
+ggplot(data = subset(b, group_ranch=="Shompole"), aes(x=hh_influence, y=proportion, group = gr_mem, fill = gr_mem)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width=0.95) + 
+  #facet_grid(~group_ranch)+
+  geom_errorbar(data = subset(b, group_ranch=="Shompole"), aes(ymax = proportion_upp, ymin = proportion_low), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  #guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#cd3700", "#008b45"), 
+                    name="Household head is\nregistered member",
+                    breaks=c("No", "Yes"),
+                    labels=c("No", "Yes")) +
+  labs(title="Shompole - How much influence do you feel this household\nhas in decision making in this Group Ranch (2 ppl said they don't know)",
+       x="Influence household has in decision making", y = "Proportion of Households") +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_sjplot() #+ 
+#theme(legend.position=c(0.975,0.6)) 
+#geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
+
+#Olkiramatian
+ggplot(data = subset(b, group_ranch=="Olkiramatian"), aes(x=hh_influence, y=proportion, group = gr_mem, fill = gr_mem)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width=0.95) + 
+  #facet_grid(~group_ranch)+
+  geom_errorbar(data = subset(b, group_ranch=="Olkiramatian"), aes(ymax = proportion_upp, ymin = proportion_low), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  #guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#cd3700", "#008b45"), 
+                    name="Household head is\nregistered member",
+                    breaks=c("No", "Yes"),
+                    labels=c("No", "Yes")) +
+  labs(title="Olkiramatian - How much influence do you feel this household\nhas in decision making in this Group Ranch",
+       x="Influence household has in decision making", y = "Proportion of Households") +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_sjplot() #+
+#theme(legend.position=c(0.975,0.6)) 
+#geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
+
+
+######################################################################################################################
+####### Survey based graph of proportion of HHS who believe there are rules about settlement and grazing
+######################################################################################################################
+
+#hhs$graz_law<-as.factor(hhs$graz_law)
+#hhs$set_rule_help<-as.factor(hhs$set_rule_help)
+hhs2 <- hhs %>% 
+  mutate(graz_law = fct_explicit_na(graz_law, "0")) %>% 
+  mutate(set_rule_help = fct_explicit_na(set_rule_help, "0")) %>% 
+  mutate(graz_law = fct_collapse(graz_law,
+                                 "There are no rules" = c("0"),
+                                 "Caused problems" = c("1","2"),
+                                 "Made no difference" = c("3"),
+                                 "Helped" = c("4","5"),
+                                 "Don't Know" = c("-99"))) %>% 
+  mutate(set_rule_help = fct_collapse(set_rule_help,
+                                      "There are no rules" = c("0"),
+                                      "Caused problems" = c("1","2"),
+                                      "Made no difference" = c("3"),
+                                      "Helped" = c("4","5"),
+                                      "Don't Know" = c("-99")))
+
+strat_design_srvyr_hhs <- hhs2 %>% 
+  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, loc_name, graz_law, set_rule_help)) %>% 
+  mutate(group_ranch = ifelse(loc_name %in% 3:4, "Shompole", "Olkiramatian"))
+
+c <- strat_design_srvyr_hhs %>% 
+  ### NOT NEEDED AS I RE FACTORED AND COMBINED ABOVE~~~ mutate(graz_law = factor(graz_law, levels = c(0,1,2,3,4,5,-99), labels=c("There are no rules","Brought many problems","Brought problems", "Made no difference", "Brought help", "Brought much help", "Don't know"))) %>% 
+  group_by(group_ranch, graz_law) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n()))
+
+d <- strat_design_srvyr_hhs %>% 
+  ### NOT NEEDED AS I RE FACTORED AND COMBINED ABOVE~~~ mutate(set_rule_help = factor(set_rule_help, levels = c(0,1,2,3,4,5,-99), labels=c("There are no rules","Brought many problems","Brought problems", "Made no difference", "Brought help", "Brought much help", "Don't know"))) %>% 
+  group_by(group_ranch, set_rule_help) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n()))
+
+ggplot(c, aes(x=group_ranch, y=proportion, group = graz_law, fill = graz_law)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data = c, aes(ymax = proportion_upp, ymin = proportion_low), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#DFDFDF", "#008b45", "#cd3700", "tan3", "#6FAFCA"), 
+                    #name="Legend Title",
+                    breaks=c("Don't Know", "There are no rules","Caused problems", "Made no difference", "Helped"),
+                    labels=c("Don't Know", "There are no rules","Caused problems", "Made no difference", "Helped")) +
+  labs(title="For your household, the Group Ranch grazing management rules about dry season reserves have ...",
+       x="Group Ranch", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 1)) +
+  theme_sjplot()  
+#theme(legend.position=c(0.975,0.6)) 
+#geom_text(aes(y = 0, label = n), position = position_dodge(width = 0.9), vjust = -1)
+
+ggplot(d, aes(x=group_ranch, y=proportion, group = set_rule_help, fill = set_rule_help)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data = d, aes(ymax = proportion_upp, ymin = proportion_low),
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#DFDFDF", "#008b45", "#cd3700", "tan3", "#6FAFCA"), 
+                    #name="Legend Title",
+                    breaks=c("Don't Know", "There are no rules","Caused problems", "Made no difference", "Helped"),
+                    labels=c("Don't Know", "There are no rules","Caused problems", "Made no difference", "Helped")) +
+  labs(title="For your household, the Group Ranch rules about where people can settle have ...",
+       x="Group Ranch", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 1)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.975,0.6)) 
+
 ############################################################################################################################################
 ############################################################################################################################################
 # model of cons support vs wealth
