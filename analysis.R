@@ -1,5 +1,6 @@
 library(tidyverse)
 library(lubridate)
+library(openxlsx)
 library(scales)
 library(googlesheets4)
 library(stats)
@@ -171,6 +172,7 @@ a_before <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit()
 
 ggplot(a_before, aes(x=sample, y=proportion, group = agree_before, fill = agree_before)) +
@@ -180,13 +182,13 @@ ggplot(a_before, aes(x=sample, y=proportion, group = agree_before, fill = agree_
   guides(fill=guide_legend(title=NULL)) +
   scale_fill_manual(values=c("#D091BB", "#BBD4A6", "#DFDFDF", "#DFDFDF"), 
                     #name="Legend Title",
-                    breaks=c("No", "Yes", "<i>Don't Know</i>", "NA"),
-                    labels=c("No", "Yes", "<i>Don't Know</i>", "NA")) +
+                    breaks=c("No", "Yes", "Don't Know", "NA"),
+                    labels=c("No", "Yes", "Don't Know", "NA")) +
   labs(title="cons agree before (NA omitted)",x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
   theme(legend.position=c(0.9,0.6))
-ggsave(filename = here::here("images", "agreed_with_cons_before.png"))
+ggsave(filename = here::here("images", "agreed_with_cons_before (enonkishu NA_omit).png"))
 
 a_now <- strat_design_srvyr_hhs %>% 
   mutate(agree_now = factor(agree_now, levels = c("No", "Yes", "<i>Don't Know</i>", NA), labels=c("No", "Yes", "Don't Know"))) %>% 
@@ -194,6 +196,7 @@ a_now <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit()
 
 ggplot(a_now, aes(x=sample, y=proportion, group = agree_now, fill = agree_now)) +
@@ -209,7 +212,7 @@ ggplot(a_now, aes(x=sample, y=proportion, group = agree_now, fill = agree_now)) 
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
   theme(legend.position=c(0.9,0.6))
-ggsave(filename = here::here("images", "agreed_with_cons_now.png"))
+ggsave(filename = here::here("images", "agreed_with_cons_now (enonkishu).png"))
 
 #######################################################################################################################
 ####### Survey based graph of proportion of HHS and a number of different variables (can be adjusted with copy paste)
@@ -225,13 +228,16 @@ strat_design_srvyr_hhs <- hhs_wealth %>%
                                                                       transparency, accountability, women_power, wild_perception))
 
 a <- strat_design_srvyr_hhs %>% 
-  group_by(sample, wild_perception) %>% 
+  group_by(sample, women_power) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
+write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
 
-ggplot(a, aes(x=sample, y=proportion, group = wild_perception, fill = wild_perception)) +
+
+ggplot(a, aes(x=sample, y=proportion, group = women_power, fill = women_power)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
   geom_errorbar(data=a, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
@@ -241,11 +247,11 @@ ggplot(a, aes(x=sample, y=proportion, group = wild_perception, fill = wild_perce
 #                    breaks=c("1","2","3", "4", "5", "6"),
 #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
 #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer")) +
-  labs(title = "feel about the wildlife living here", x="Conservancy", y = "Proportion of Households") +
+  labs(title = "Women have the power to influence decisions in this conservancy", x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
   theme(legend.position=c(0.4,0.9))
-ggsave(filename = here::here("images", "feel about the wildlife living here.png"))
+ggsave(filename = here::here("images", "Women have the power to influence decisions in this conservancy (enonkishu).png"))
 
 ############################################################################################################################################
 ############################################################################################################################################
