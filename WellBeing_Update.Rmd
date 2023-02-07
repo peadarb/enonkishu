@@ -88,7 +88,7 @@ In the next slides we discuss the results of the study under the following theme
 ---
 # Governance
 ```{r echo=FALSE}
-knitr::include_graphics("images/authority over conservancy.png")
+knitr::include_graphics("images/auth over conservancy.png")
 ```
 
 ---
@@ -118,7 +118,7 @@ knitr::include_graphics("images/sufficiently informed about the use of the money
 ---
 # Women and Governance 
 ```{r echo=FALSE}
-knitr::include_graphics("images/women have power to influence decisions in this conservancy.png")
+knitr::include_graphics("images/women have the power.png")
 ```
 
 ---

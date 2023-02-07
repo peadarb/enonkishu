@@ -483,6 +483,66 @@ ggplot(a, aes(x=sample, y=proportion, group = women_power, fill = women_power)) 
   theme(legend.position=c(0.4,0.9))
 ggsave(filename = here::here("images", "Women have the power to influence decisions in this conservancy (enonkishu).png"))
 
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (women and power)
+######################################################################################################################
+
+w <- strat_design_srvyr_hhs %>% 
+  group_by(sample, women_power) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+write.xlsx(w, here::here("images", "women_power_all.xlsx"))
+
+
+ggplot(w, aes(x=sample, y=proportion, group = women_power, fill = women_power)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=a, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  #  scale_fill_manual(values=c("#008b45","#6FAFCA","yellow3", "tan3", "#cd3700", "#DFDFDF"), 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Women have the power to influence decisions in this conservancy", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.75,0.7))
+ggsave(filename = here::here("images", "Women have the power.png"))
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (authority over conservancy)
+######################################################################################################################
+
+aoc <- strat_design_srvyr_hhs %>% 
+  group_by(sample, conserve_authority) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+write.xlsx(aoc, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(aoc, aes(x=sample, y=proportion, group = conserve_authority, fill = conserve_authority)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=aoc, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  #  scale_fill_manual(values=c("#008b45","#6FAFCA","yellow3", "tan3", "#cd3700", "#DFDFDF"), 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Authority Over Conservancy", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.5,0.8))
+ggsave(filename = here::here("images", "auth over conservancy.png"))
+
 ############################################################################################################################################
 ############################################################################################################################################
 # model of cons support vs wealth
