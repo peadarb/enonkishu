@@ -1,0 +1,194 @@
+---
+title: "Enonkishu Conservancy Social and Wellbeing Survey"
+subtitle: "Exploring the Socio-economic Impact of Enonkishu Conservancy on Leaseholders"
+author: "Dr. Peadar Brehony, Dr. Peter Tyrrell, Dr. Lauren Evans, Rose Muiyuro,  Rebecca Karimi, Esther Kang'ethe"
+#institute: "Dascot Ltd.
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default,metropolis, metropolis-fonts, "my_css.css"]
+    seal: T
+    nature:
+    ## autoplay: 30000 ##for 30 second slides
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      logo: "images/Dascot_Logo.png"
+      main-color: "#2E8B57"
+      ratio: "16:9"
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+knitr::opts_chunk$set(
+  fig.asp = 12/16,
+  fig.align = 'center',
+  echo = F,
+  out.width = "50%",
+  dpi= 300
+)
+
+```
+
+```{r libraries}
+library(tidyverse)
+library(officer)
+library(gdtools)
+library(webshot)
+```
+
+
+```{r setting functions to produce individual formatted tables}
+std_border = fp_border(color="#000000", width = 2)
+require("gdtools")
+fontname <- "Calibri Light"
+```
+
+
+# Aim and Objective 
+This survey is an assessment of the Northern Mara Conservancies that aims at finding out more about the impacts that the conservancies have on the livelihoods of the land owners and the purpose is to monitor the members’ and non-members’ perspectives of the conservancies in the area. 
+
+This will then  provide key stakeholders with recommendations that they can consistently use to inform the strategies of the conservancies and work with land owners and community members to increase understanding and appreciation of the role of conservancies in the Mara.
+
+---
+
+# Choice of Questions
+We developed questions that would help us deduce the respondents well-being before and after establishment of the conservancies. These questions were also translated to Swahili and Maa languages. The questionnaire was then used to create a survey form that was uploaded on ODK Collect, an app that was used by the enumerators in the field to collect data.
+
+# Sample Frame
+To construct a sample frame, a list of the land owners from each conservancy was collected and compiled from the community liaisons of each of the conservancies. Landowners living in the conservancies and those living outside totaled 414. Out of this a sample size of 150 households was randomly picked. The sample frame used included all heads of households from each area; the heads of households were defined but were not gender specific. 
+
+
+An ethics document was developed and translated, it explained what and why we were doing the survey, how the data would be used; that we could not make any guarantee that the interview or research would lead to changes in their life; that access and dissemination of all the information they provided would remain confidential and anonymous; and that they were free to refuse to answer any question, or to terminate the survey at any time, without explanation. The research assistant then had to ask explicitly if they consented to participate, and their answer was recorded. 
+
+---
+
+# Methodology
+3 enumerators were recruited to carry out data collection where each enumerator was to interview a 50 household heads each. Here, a household (olmarei) was defined as a household within the homestead boma (enkang’ ), with its own gate. The household (olmarei) can make decisions about most things independently. The household head (olopeny olmarei) can be a man or woman who has dependents, like one or more wives, children, grandchildren, parents, dependent siblings, and others who live with the family and depend on them for food. It can also be a woman who looks after herself and her family, or a widow, or any son who does not rely on his father, even if he lives in the same homestead boma (enkang’ ). The household (olmarei) might have houses (inkajijik ) here, and elsewhere, like in another homestead boma or a town center and it is important that you include them in your calculations about your household. An old man should not include in his calculations, his sons who now have their own households (olmarei). The household survey questions were directed at the head of the household (olopeny olmarei). 
+Training the enumerators was then scheduled and held on 17th and 18th October 2022. The purpose of the training was to introduce the enumerators to the purpose of the survey, definitions of key terms, help them understand the different components of the survey questionnaire, best practices during data collection, address research ethics, etc. It also involved practice interviews where the enumerators went through a test data collection exercise using the ODK app and phones provided to them and they were also allowed to suggest any amendments prior to actual deployment. 
+
+---
+
+# Data Collection and Validation
+The actual data collection in Enonkishu, Lemek, Ol Chorro, Mbokishi, Narok town, and other localities began on 3rd November 2022 and took 3 weeks to be completed. Interviews were conducted mainly at the household head’s homestead and each interview lasted on average 45 minutes. Answers were recorded on the ODK collect app in real time and upon completion, the form was finalized and sent to the server. 
+Validation of the data coming in from the enumerators was done on a daily basis through the server and at least 7% of the interviewed respondents were called after the interviews to ask them on how their experience was, how long the enumerators stayed, what kind of questions they were asked and whether they had any questions. Of the total land title holders randomly sampled, a total of 141 submissions were made where 125 respondents (87%) were willing to participate in the interview while 16 (11%) of them refused to participate. 
+The data collected will help us to improve our knowledge of the impacts the conservancies have on the land owners and their livelihoods, and the results will help us identify areas that require more attention from the conservancies’ management and the relevant decision-makers. 
+
+---
+# Results
+
+In the next slides we discuss the results of the study under the following themes:
+1. Governance
+2. Well-being
+
+---
+# Governance
+```{r echo=FALSE}
+knitr::include_graphics("images/authority over conservancy.png")
+```
+
+---
+# Household Influence in the Conservancy
+```{r echo=FALSE}
+knitr::include_graphics("images/influence hh has in decision making in conservancy.png")
+```
+
+---
+# Satisfaction with Accountability
+```{r echo=FALSE}
+knitr::include_graphics("images/satisfied with accountability in conservancy.png")
+```
+
+---
+# Satisfaction with Transparency
+```{r echo=FALSE}
+knitr::include_graphics("images/satisfied with transparency of decision making in conservancy.png")
+```
+
+---
+# Use of Money in the Conservancy 
+```{r echo=FALSE}
+knitr::include_graphics("images/sufficiently informed about the use of the money by the conservancy.png")
+```
+
+---
+# Women and Governance 
+```{r echo=FALSE}
+knitr::include_graphics("images/women have power to influence decisions in this conservancy.png")
+```
+
+---
+# Women and Governance: Enonkishu Vs Others 
+```{r echo=FALSE}
+knitr::include_graphics("images/Women have the power to influence decisions in this conservancy (enonkishu vs other conservancies).png")
+```
+
+---
+# Employment Status per Conservancy
+```{r echo=FALSE}
+knitr::include_graphics("images/occupation.png")
+```
+
+---
+# Education Levels per conservancy 
+```{r echo=FALSE}
+knitr::include_graphics("images/level of education completed.png")
+```
+
+---
+# Access to education facilities 
+```{r echo=FALSE}
+knitr::include_graphics("images/access_to_edu_facilities.png")
+```
+
+---
+# Access to health facilities 
+```{r echo=FALSE}
+knitr::include_graphics("images/access_to_health_facilities.png")
+```
+
+---
+# Access to electricity facilities 
+```{r echo=FALSE}
+knitr::include_graphics("images/access_to_electricity_facilities.png")
+```
+
+---
+# Skipping Meals 
+```{r echo=FALSE}
+knitr::include_graphics("images/skip meals before after.png")
+```
+
+---
+# Mobility
+```{r echo=FALSE}
+knitr::include_graphics("images/level of mobility.png")
+```
+
+---
+# Growing of Crops 
+```{r echo=FALSE}
+knitr::include_graphics("images/crop_yn.png")
+```
+
+---
+# Living with Wildlife 
+```{r echo=FALSE}
+knitr::include_graphics("images/feel about the wildlife living here.png")
+```
+
+---
+# Agree with Conservancy Now 
+```{r echo=FALSE}
+knitr::include_graphics("images/Sankey agree with cons before after.png")
+```
+
+---
+#Well-Being 
+```{r echo=FALSE}
+knitr::include_graphics("images/wellbeing sankey.png")
+```

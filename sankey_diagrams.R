@@ -118,7 +118,7 @@ ggplot(sankey, aes(x = x,
                fill = factor(node), 
                label = node)) +
   geom_alluvial(flow.alpha = .6) +
-  geom_alluvial_text(size = 3, color = "white") +
+  geom_alluvial_text(size = 3, color = "black") +
   #scale_fill_viridis_d(option = "magma", direction = -1) +
   #scale_fill_manual(values = c("NA" = "#999999", "10" = "#999999"))%>% 
   theme_alluvial(base_size = 18) +
@@ -131,8 +131,8 @@ ggplot(sankey, aes(x = x,
         axis.title.y=element_blank(),
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
-  ggtitle("Wellbeing before after")
-#ggsave(filename = here::here("images", "wellbeing sankey.png"))
+  ggtitle("Comparison of the leaseholders wellbeing \nbefore and after joining the conservancy")
+ggsave(filename = here::here("images", "wellbeing sankey.png"))
 
 ########################################################################################################################################################################################
 ########  skip meals before after   ################################################################################################################################
@@ -171,8 +171,8 @@ ggplot(sankey, aes(x = x,
         axis.title.y=element_blank(),
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
-  ggtitle("Skip meals before after")
-#ggsave(filename = here::here("images", "Skip meals before after.png"))
+  ggtitle("Rate of Leaseholders skipping meals \nbefore and after joining the conservancies")
+ggsave(filename = here::here("images", "Skip meals before after.png"))
 
 strat_design_srvyr_changes <- hhs_wealth %>% 
   mutate(wellbeing_before = as.numeric(wellbeing_before)) %>% 
@@ -240,7 +240,7 @@ ggplot(sankey, aes(x = x,
         axis.title.y=element_blank(),
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
-  ggtitle("Agree with cons before after")
+  ggtitle("Change in acceptance of conservancies \nbefore their establishment and now")
 ggsave(filename = here::here("images", "Sankey agree with cons before after.png"))
 
 
