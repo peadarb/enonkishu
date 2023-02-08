@@ -284,10 +284,10 @@ ggplot(each_conserve_mobility, aes(x=sample, y=proportion, group = mobility, fil
   geom_errorbar(data=each_conserve_mobility, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
-  scale_fill_manual(values=c("#D091BB", "#BBD4A6", "#DFDFDF"), 
+  # scale_fill_manual(values=c("#D091BB", "#BBD4A6", "#DFDFDF"), 
                     #name="Legend Title",
-                    breaks=c("None", "Livestock only move", "I do not want to answer"),
-                    labels=c("None", "Livestock only move", "I do not want to answer")) +
+                    #breaks=c("None", "Livestock only move", "I do not want to answer"),
+                    #labels=c("None", "Livestock only move", "I do not want to answer")) +
   labs(title="Level of household mobility",x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
@@ -314,10 +314,10 @@ ggplot(each_conserve_edu, aes(x=sample, y=proportion, group = edu, fill = edu)) 
   geom_errorbar(data=each_conserve_edu, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
-  scale_fill_manual(values=c("#F5B7B1", "#D091BB", "#A9CCE3", "#BBD4A6", "#FAD7A0", "#2E86C1", "#DFDFDF"), 
+  # scale_fill_manual(values=c("#F5B7B1", "#D091BB", "#A9CCE3", "#BBD4A6", "#FAD7A0", "#2E86C1", "#DFDFDF"), 
                     #name="Legend Title",
-                    breaks=c("None", "Adult literacy classes (Gumbaru)", "Primary", "Secondary", "Diploma", "Degree", "I do not want to answer"),
-                    labels=c("None", "Adult literacy classes (Gumbaru)", "Primary", "Secondary", "Diploma", "Degree", "I do not want to answer")) +
+                    # breaks=c("None", "Adult literacy classes (Gumbaru)", "Primary", "Secondary", "Diploma", "Degree", "I do not want to answer"),
+                    # labels=c("None", "Adult literacy classes (Gumbaru)", "Primary", "Secondary", "Diploma", "Degree", "I do not want to answer")) +
   labs(title="Level of education completed",x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
@@ -497,12 +497,13 @@ w <- strat_design_srvyr_hhs %>%
 write.xlsx(w, here::here("images", "women_power_all.xlsx"))
 
 
+
 ggplot(w, aes(x=sample, y=proportion, group = women_power, fill = women_power)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
   geom_errorbar(data=a, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
-  #  scale_fill_manual(values=c("#008b45","#6FAFCA","yellow3", "tan3", "#cd3700", "#DFDFDF"), 
+  scale_fill_manual(values=c("#fde0ef","#a1d76a","#e9a3c9", "#e6f5d0", "#f7f7f7", "#4d9221", "#c51b7d")) + 
   #                    #name="Legend Title",
   #                    breaks=c("1","2","3", "4", "5", "6"),
   #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
@@ -532,7 +533,7 @@ ggplot(aoc, aes(x=sample, y=proportion, group = conserve_authority, fill = conse
   geom_errorbar(data=aoc, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
-  #  scale_fill_manual(values=c("#008b45","#6FAFCA","yellow3", "tan3", "#cd3700", "#DFDFDF"), 
+  #  scale_fill_manual(values=c("#fde0ef","#a1d76a","#e9a3c9", "#e6f5d0", "#f7f7f7", "#4d9221", "#c51b7d"), 
   #                    #name="Legend Title",
   #                    breaks=c("1","2","3", "4", "5", "6"),
   #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
@@ -542,6 +543,314 @@ ggplot(aoc, aes(x=sample, y=proportion, group = conserve_authority, fill = conse
   theme_sjplot() + 
   theme(legend.position=c(0.5,0.8))
 ggsave(filename = here::here("images", "auth over conservancy.png"))
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (HH influence in the conservancy)
+######################################################################################################################
+
+inf <- strat_design_srvyr_hhs %>% 
+  group_by(sample, influence) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+#write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(inf, aes(x=sample, y=proportion, group = influence, fill = influence)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=inf, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#f7f7f7","#a1d76a","#4d9221", "#e9a3c9", "#c51b7d")) + 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Household Influence in the Conservancy", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.5,0.8))
+ggsave(filename = here::here("images", "inf in conservancy.png"))
+
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (Accountability in the conservancy)
+######################################################################################################################
+
+acct <- strat_design_srvyr_hhs %>% 
+  group_by(sample, accountability) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+#write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(acct, aes(x=sample, y=proportion, group = accountability, fill = accountability)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=acct, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#f7f7f7","#a1d76a","#e9a3c9", "#4d9221", "#c51b7d")) + 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Satisfaction with Accountability", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.5,0.8))
+ggsave(filename = here::here("images", "accountability in conservancy.png"))
+
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (Transparency in the conservancy)
+######################################################################################################################
+
+trans <- strat_design_srvyr_hhs %>% 
+  group_by(sample, transparency) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+#write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(trans, aes(x=sample, y=proportion, group = transparency, fill = transparency)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=trans, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#f7f7f7","#a1d76a","#e9a3c9", "#4d9221", "#c51b7d")) + 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Satisfaction with Transparency", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.5,0.8))
+ggsave(filename = here::here("images", "transparency in conservancy.png"))
+
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (Use of Money in the Conservancy )
+######################################################################################################################
+
+money_use <- strat_design_srvyr_hhs %>% 
+  group_by(sample, income_informed) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+#write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(money_use, aes(x=sample, y=proportion, group = income_informed, fill = income_informed)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=money_use, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#f7f7f7", "#c51b7d", "#4d9221")) + 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Household awareness on the use of money in the conservancy", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.5,0.95))
+ggsave(filename = here::here("images", "Use of Money in the Conservancy.png"))
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (Employment Status per Conservancy)
+######################################################################################################################
+
+occp <- strat_design_srvyr_hhs %>% 
+  group_by(sample, occupation) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+#write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(occp, aes(x=sample, y=proportion, group = occupation, fill = occupation)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=occp, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  # scale_fill_manual(values=c("#fde0ef","#a1d76a","#f7f7f7", "#e6f5d0", "#c51b7d", "#e9a3c9", "#4d9221")) + 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Leaseholder Occupations", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.5,0.8))
+ggsave(filename = here::here("images", "Leaseholder Occupations.png"))
+
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (Education Levels per conservancy )
+######################################################################################################################
+
+edu <- strat_design_srvyr_hhs %>% 
+  group_by(sample, access_edu) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+#write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(edu, aes(x=sample, y=proportion, group = access_edu, fill = access_edu)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=edu, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#fde0ef","#a1d76a","#e9a3c9", "#e6f5d0", "#f7f7f7", "#4d9221", "#c51b7d")) + 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Access to Education", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.97,0.8))
+ggsave(filename = here::here("images", "education access.png"))
+
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (Access to health facilities)
+######################################################################################################################
+
+health <- strat_design_srvyr_hhs %>% 
+  group_by(sample, access_health) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+#write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(health, aes(x=sample, y=proportion, group = access_health, fill = access_health)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=health, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#fde0ef","#a1d76a","#e9a3c9", "#e6f5d0", "#f7f7f7", "#4d9221", "#c51b7d")) + 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Access to Health", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.97,0.8))
+ggsave(filename = here::here("images", "access_to_health.png"))
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (Access to electricity services)
+######################################################################################################################
+
+elec <- strat_design_srvyr_hhs %>% 
+  group_by(sample, access_elec) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+#write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(elec, aes(x=sample, y=proportion, group = access_elec, fill = access_elec)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=elec, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#fde0ef","#a1d76a","#e9a3c9", "#e6f5d0", "#f7f7f7", "#4d9221", "#c51b7d")) + 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Access to Electricity", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.95,0.8))
+ggsave(filename = here::here("images", "access_to_electricity.png"))
+
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (Growing Crops)
+######################################################################################################################
+
+crops <- strat_design_srvyr_hhs %>% 
+  group_by(sample, crop_yn) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+#write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(crops, aes(x=sample, y=proportion, group = crop_yn, fill = crop_yn)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=crops, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#f7f7f7", "#c51b7d", "#4d9221")) + 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Growing of Crops", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.8,0.95))
+ggsave(filename = here::here("images", "crops.png"))
+
+#######################################################################################################################
+####### Survey based graph of proportion of HHS and a number of different variables (Wildlife Perception)
+######################################################################################################################
+
+wildlife <- strat_design_srvyr_hhs %>% 
+  group_by(sample, wild_perception) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  na.omit() 
+#write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
+
+
+ggplot(wildlife, aes(x=sample, y=proportion, group = wild_perception, fill = wild_perception)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=wildlife, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#e6f5d0", "#f7f7f7", "#c51b7d", "#4d9221")) + 
+  #                    #name="Legend Title",
+  #                    breaks=c("1","2","3", "4", "5", "6"),
+  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+  labs(title = "Wildlife Perceptions", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 0.9)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.8,0.95))
+ggsave(filename = here::here("images", "wildlife.png"))
+
+
 
 ############################################################################################################################################
 ############################################################################################################################################
