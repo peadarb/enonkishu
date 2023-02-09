@@ -95,6 +95,7 @@ ggsave(filename = here::here("images", "wellbeing after enonkishu.png"))
 ########################################################################################################################################################################################
 
 sankey <- hhs_wealth %>% 
+  filter(sample == "Enonkishu") %>% 
   mutate(wellbeing_before = as.numeric(wellbeing_before)) %>% 
   mutate(wellbeing_before = as.factor(wellbeing_before)) %>% 
   mutate(wellbeing_before = fct_explicit_na(wellbeing_before, na_level = "NA")) %>% 
@@ -108,8 +109,8 @@ sankey <- hhs_wealth %>%
          cow_now, sheep_now, goat_now, donkey_now,
          agree_before, agree_now, total_before_tlu, total_now_tlu)%>% 
   make_long(wellbeing_before, wellbeing_after) %>% 
-  mutate(node = fct_relevel(node, "NA", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), 
-         next_node = fct_relevel(next_node, "NA", "1", "2","3", "4", "5", "6", "7", "8", "9", "10"))
+  mutate(node = fct_relevel(node, "NA", "4", "5", "6", "7", "8", "9", "10"), 
+         next_node = fct_relevel(next_node, "8", "9", "10"))
 
 ggplot(sankey, aes(x = x, 
                next_x = next_x, 
@@ -131,8 +132,10 @@ ggplot(sankey, aes(x = x,
         axis.title.y=element_blank(),
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
-  ggtitle("Wellbeing before after")
-#ggsave(filename = here::here("images", "wellbeing sankey.png"))
+  scale_fill_viridis_d(option = "D", alpha = 0.95) + 
+  theme(plot.title = element_text(size=10)) +
+  ggtitle("1-10 score of life before leases were paid by the conservancy and now")
+ggsave(filename = here::here("images/paper", "wellbeing sankey.png"))
 
 ########################################################################################################################################################################################
 ########  skip meals before after   ################################################################################################################################
