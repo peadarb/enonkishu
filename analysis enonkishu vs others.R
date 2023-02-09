@@ -682,17 +682,26 @@ library(RColorBrewer)
 projcrs <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 map <- hhs_wealth %>% 
   select(id, sample, `_129. Location (GPS)_latitude`, `_129. Location (GPS)_longitude`, `_129. Location (GPS)_precision`) %>% 
+  mutate(
+    sample = case_when(
+      sample == "Mbokishi" ~ "Other northern conservancies",
+      sample == "Enonkishu" ~ "Enonkishu",
+      sample == "Lemek" ~ "Other northern conservancies",
+      sample == "Ol Chorro" ~ "Other northern conservancies",
+      sample == "Outside" ~ "No conservancy")) %>% 
   rename(lat = `_129. Location (GPS)_latitude`, lon = `_129. Location (GPS)_longitude`, precision = `_129. Location (GPS)_precision`) %>% 
   filter(precision < 3000) %>% 
   st_as_sf(coords = c("lon", "lat"), crs = projcrs)
+
+saveRDS(map, "map.rds")
 
 mapview::mapview(map, 
                  zcol = "sample", 
                  #col.regions = "cornsilk2", 
                  alpha.regions = 1,
-                 cex = 5,
+                 cex = 3,
                  lwd = 0.2,
-                 col.regions=brewer.pal(5, "Set1"),
+                 col.regions=brewer.pal(3,"Set1"),
                  layer.name = "Conservancy title holder")
 
 ggplot(data = map) +
