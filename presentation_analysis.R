@@ -8,7 +8,7 @@ library(stats4)
 library(survey)
 library(srvyr, warn.conflicts = FALSE)
 library(sjPlot)
-ggsave <- function(..., bg = 'white') ggplot2::ggsave(..., bg = bg)
+
 
 
 ######################################################################################################################
@@ -279,7 +279,7 @@ each_conserve_mobility <- strat_design_srvyr_house %>%
             #total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n()))
 
-ggplot(each_conserve_mobility, aes(x=sample, y=proportion, group = mobility, fill = mobility)) +
+ggplot(each_conserve_mobility, aes(x=mobility, y=proportion, fill = mobility)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
   geom_errorbar(data=each_conserve_mobility, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
@@ -290,8 +290,8 @@ ggplot(each_conserve_mobility, aes(x=sample, y=proportion, group = mobility, fil
                     #labels=c("None", "Livestock only move", "I do not want to answer")) +
   labs(title="Level of household mobility",x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 1)) +
-  theme_sjplot() + 
-  theme(legend.position=c(0.62,0.9))
+  cowplot::theme_half_open() + 
+  facet_wrap(~sample, drop = T, ncol=1) + coord_flip()
 ggsave(filename = here::here("images", "level of mobility.png"))
 
 ######################################################################################################################
