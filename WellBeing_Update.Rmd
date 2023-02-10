@@ -1,6 +1,6 @@
 ---
 title: "Enonkishu Conservancy Social and Wellbeing Survey"
-subtitle: "Exploring the Socio-economic Impact of Enonkishu Conservancy on Leaseholders"
+subtitle: "Exploring the Socioeconomic Impact of Enonkishu Conservancy on Landowners"
 author: "Dr. Peadar Brehony, Dr. Peter Tyrrell, Dr. Lauren Evans, Rebecca Karimi, Rose Muiyuro, Esther Kang'ethe"
 #institute: "Dascot Ltd.
 date: "`r Sys.Date()`"
@@ -50,40 +50,58 @@ fontname <- "Calibri Light"
 
 
 # Aim and Objective 
-This survey was an assessment of the Northern Mara Conservancies that aimed at finding out more about the impacts that the conservancies have had on the livelihoods of the land owners. This was done by monitoring the members’ and non-members’ perspectives of the conservancies in the area. 
 
-This will then  provide key stakeholders with recommendations that they can consistently use to inform the strategies of the conservancies and work with land owners and community members to increase understanding and appreciation of the role of conservancies in the Mara.
+* This survey was an assessment of the impact of Northern Mara Conservancies  on the livelihoods of the landowners. 
+
+* We assessed the members’ and non-members’ perspectives and  of the conservancies in the area, and important social and economic indicators. 
+
+* We developed questions that would help us deduce the respondents well-being before and after establishment of the conservancies.
+
+
 
 ---
 
 # Choice of Questions
-We developed questions that would help us deduce the respondents well-being before and after establishment of the conservancies. These questions were also translated to Swahili and Maa languages. The questionnaire was then used to create a survey form that was uploaded on ODK Collect, an app that was used by the enumerators in the field to collect data.
+
+These questions were also translated to Swahili and Maa languages and administered using a mobile applications and three trained local enumerator.
 
 # Sample Frame
-To construct the sample frame, a list of the land owners from each conservancy was collected and compiled from the community liaisons of each of the conservancies. Landowners living in the conservancies and those living outside totaled 414. Out of this a sample size of 150 households was randomly picked. The sample frame used included all heads of households from each area; the heads of households were defined but were not gender specific. 
+To construct the sample frame, a list of the land owners from each conservancy was collected and compiled from the community liaisons of each of the conservancies. Landowners living in the conservancies and those living outside totalled 414. 
 
+Out of this a sample size of 150 households was randomly picked.
 
-An ethics document was developed and translated, it explained what and why we were doing the survey, how the data would be used; that we could not make any guarantee that the interview or research would lead to changes in their life; that access and dissemination of all the information they provided would remain confidential and anonymous; and that they were free to refuse to answer any question, or to terminate the survey at any time, without explanation. The research assistant then had to ask explicitly if they consented to participate, and their answer was recorded. 
+An ethics document was developed and translated. The research assistant then had to ask explicitly if they consented to participate, and their answer was recorded. 
 
 ---
 
 # Methodology
-3 enumerators were recruited to carry out data collection where each enumerator was to interview 50 household heads. Here, a household (olmarei) was defined as a household within the homestead boma (enkang’ ), with its own gate. The household (olmarei) can make decisions about most things independently. The household head (olopeny olmarei) could be a man or woman who had dependents, like one or more wives, children, grandchildren, parents, dependent siblings, and others who lived with the family and depended on them for food. It could also be a woman who looked after herself and her family, or a widow, or any son who does not relying on his father, even if he lived in the same homestead boma (enkang’ ). The household (olmarei) might have had houses (inkajijik ) here, and elsewhere, like in another homestead boma or a town center and it was important to include them in the calculations about the household. An old man could not include in his calculations, his sons who now had their own households (olmarei). The household survey questions were directed at the head of the household (olopeny olmarei). 
-Training the enumerators was then scheduled and held on 17th and 18th October 2022. The purpose of the training was to introduce the enumerators to the purpose of the survey, definitions of key terms, help them understand the different components of the survey questionnaire, best practices during data collection, address research ethics, etc. It also involved practice interviews where the enumerators went through a test data collection exercise using the ODK app and phones provided to them and they were also allowed to suggest any amendments prior to actual deployment. 
+
+* Three  enumerators were recruited to carry out data collection where each enumerator was to interview 50 household heads. 
+
+* Training the enumerators was then scheduled and held on 17th and 18th October 2022. 
+
+* It also involved practice interviews.
 
 ---
 
 # Data Collection and Validation
-The actual data collection in Enonkishu, Lemek, Ol Chorro, Mbokishi, Narok town, and other localities began on 3rd November 2022 and took 3 weeks to be completed. Interviews were conducted mainly at the household head’s homestead and each interview lasted on average 45 minutes. Answers were recorded on the ODK collect app in real time and upon completion, the form was finalized and sent to the server. 
-Validation of the data coming in from the enumerators was done on a daily basis through the server and at least 7% of the interviewed respondents were called after the interviews to ask them on how their experience was, how long the enumerators stayed, what kind of questions they were asked and whether they had any questions. Of the total land title holders randomly sampled, a total of 141 submissions were made where 125 respondents (87%) were willing to participate in the interview while 16 (11%) of them refused to participate. 
-The data collected will help us to improve our knowledge of the impacts the conservancies have on the land owners and their livelihoods, and the results will help us identify areas that require more attention from the conservancies’ management and the relevant decision-makers. 
+
+* The data collection in Enonkishu, Lemek, Ol Chorro, Mbokishi, Narok town, and other localities began on 3rd November 2022 and took 3 weeks to be completed.
+
+* Interviews were conducted mainly at the household head’s homestead and each interview lasted on average 45 minutes. 
+
+* Validation of the data coming in from the enumerators was done on a daily basis through the server. 
+
+* 7% of the interviewed respondents were called after the interviews to ask them on how their experience was, how long the enumerators stayed, what kind of questions they were asked and whether they had any questions.
+
+* Of the total land title holders randomly sampled, a total of 141 submissions were made where 125 respondents (87%) were willing to participate in the interview while 16 (11%) of them refused to participate. 
 
 ---
 # Results
 
 In the next slides we discuss the results of the study under the following themes:
 1. Governance
-2. Well-being
+2. Wellbeing and livelihoods
 
 ---
 # Governance
