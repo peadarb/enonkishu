@@ -467,7 +467,7 @@ a <- strat_design_srvyr_hhs %>%
   #                                levels = c("Brought much help","Brought Help","Brought problems", "Made no difference", "<i>Don't Know</i>"), 
   #                                labels=c("Very helpful","Helpful","Problematic", "Very problematic", "Don't Know"))) %>% 
   na.omit() 
-#write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
+write.xlsx(a, here::here("images/paper", "activity_before (enonkishu vs other conservancies vs outside).xlsx"))
 
 ggplot(a, aes(x=stype, y=proportion, group = activity_before1, fill = activity_before1)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
@@ -494,7 +494,7 @@ b <- strat_design_srvyr_hhs %>%
   #                                levels = c("Brought much help","Brought Help","Brought problems", "Made no difference", "<i>Don't Know</i>"), 
   #                                labels=c("Very helpful","Helpful","Problematic", "Very problematic", "Don't Know"))) %>% 
   na.omit() 
-#write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
+write.xlsx(a, here::here("images/paper", "activity_now (enonkishu vs other conservancies vs outside).xlsx"))
 
 ggplot(b, aes(x=stype, y=proportion, group = activity_current1, fill = activity_current1)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
