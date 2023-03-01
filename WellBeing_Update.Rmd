@@ -101,106 +101,142 @@ An ethics document was developed and translated. The research assistant then had
 
 In the next slides we discuss the results of the study under the following themes:
 1. Governance
-2. Wellbeing and livlihoods
+2. Wellbeing and livelihoods
+
 
 ---
-# Governance
-```{r echo=FALSE, fig.cap= "Who has the authority over THIS conservancy?"}
+class: full
+
+Governance
+
+---
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/auth over conservancy.png")
 ```
 
 ---
-# Household Influence in the Conservancy
-```{r echo=FALSE, fig.cap= "How much influence do you feel the land title holder's household has in decision making in THIS conservancy?"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/inf in conservancy.png")
 ```
 
 ---
-# Satisfaction with Accountability
-```{r echo=FALSE, fig.cap= "Are you satisfied with the level of accountability in THIS conservancy's decision making?"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/accountability in conservancy.png")
 ```
 
 ---
-# Satisfaction with Transparency
-```{r echo=FALSE, fig.cap= "Are you satisfied with the transparency of decision making in THIS conservancy?"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/transparency in conservancy.png")
 ```
 
 ---
-# Use of Money in the Conservancy 
-```{r echo=FALSE, fig.cap= "Do you feel like the land title holder's household is sufficiently informed about the use of the money by the conservancy?"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/Use of Money in the Conservancy.png")
 ```
 
 ---
-# Women and Governance 
-```{r echo=FALSE, fig.cap= "Do you agree with this statement: Women have the power to influence decisions in this conservancy"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/women have the power.png")
 ```
 
 ---
-# Employment Status per Conservancy
-```{r echo=FALSE, fig.cap= "Can you please rank the 3 main activities which contribute to the land title holder's household's livelihood at the moment?"}
+class: full
+
+```{r echo=FALSE, fig.cap= "At the time that THIS conservancy was set up, did the land title holder personally agree with that decision? Does the land title holder agree with the community's decision to have THIS conservancy at the moment?"}
+knitr::include_graphics("images/Sankey agree with cons before after.png")
+```
+
+
+---
+class: full
+
+Wellbeing and livelihoods
+
+---
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/Leaseholder Occupations.png")
 ```
 
 ---
-# Access to education facilities 
-```{r echo=FALSE, fig.cap= "Please tell us how you feel about each of the following statements. Currently, I am happy with my household's access to education facilities and services"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/education access.png")
 ```
 
 ---
-# Education Levels per conservancy 
-```{r echo=FALSE, fig.cap= "What is the highest completed level of education of the land title holder?"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/level of education completed.png")
 ```
 
 ---
-# Access to health facilities 
-```{r echo=FALSE, fig.cap= "Please tell us how you feel about each of the following statements. Currently, I am happy with my household's access to health facilities and services"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/access_to_health.png")
 ```
 
 ---
-# Access to electricity facilities 
-```{r echo=FALSE, fig.cap= "Please tell us how you feel about each of the following statements. Currently, I am happy with my household's access to electricity services"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/access_to_electricity.png")
 ```
 
 ---
-# Skipping Meals 
+class: full
+
 ```{r echo=FALSE, fig.cap= "Before land access payments were paid by the conservancy, how often did the land title holder's household skip meals due to food shortage? At the moment, how often does the land title holder's household skip meals due to food shortage?"}
 knitr::include_graphics("images/skip meals before after.png")
 ```
 
 ---
-# Mobility
-```{r echo=FALSE, fig.cap= "What is the level of relocating of the land title holder's household to access livestock grazing, but not during a bad drought?"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/level of mobility.png")
 ```
 
 ---
-# Growing of Crops 
-```{r echo=FALSE, fig.cap= "Has the land title holder's household cultivated crops in the last year, here or elsewhere?"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/crops.png")
 ```
 
 ---
-# Living with Wildlife 
-```{r echo=FALSE, fig.cap= "How do you feel about the wildlife living here?"}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/wildlife.png")
 ```
 
 ---
-# Agree with Conservancy Now 
+class: full
+
 ```{r echo=FALSE, fig.cap= "At the time that THIS conservancy was set up, did the land title holder personally agree with that decision? Does the land title holder agree with the community's decision to have THIS conservancy at the moment?"}
 knitr::include_graphics("images/Sankey agree with cons before after.png")
 ```
 
 ---
-#Well-Being 
-```{r echo=FALSE}
+class: full
+
+```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/wellbeing sankey.png")
 ```

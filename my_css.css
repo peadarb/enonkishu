@@ -1,0 +1,32 @@
+.full {
+  padding: 0px;
+  display: flex;
+
+}
+
+.full p {
+  margin: 0px;
+  
+}
+
+
+.remark-slide-content.full {
+    background-color: #FAFAFA;
+    border-top: 0px solid #23373B;
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1.5;
+    padding: 0px;
+  display: flex;
+
+}
+
+.full p {
+  margin: 0px;
+  
+}
+
+.full p {
+  margin: 0px;
+  
+}
