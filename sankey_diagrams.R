@@ -14,7 +14,7 @@ library(sjPlot)
 ####### import cleaned household survey data with wealth index
 ######################################################################################################################
 
-rm(list=ls())
+#rm(list=ls())
 
 hhs_wealth <- readRDS("hhs_cleaned_wealth.rds")
 head(hhs_wealth)

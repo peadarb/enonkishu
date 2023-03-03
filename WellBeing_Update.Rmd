@@ -230,13 +230,6 @@ knitr::include_graphics("images/wildlife.png")
 ---
 class: full
 
-```{r echo=FALSE, fig.cap= "At the time that THIS conservancy was set up, did the land title holder personally agree with that decision? Does the land title holder agree with the community's decision to have THIS conservancy at the moment?"}
-knitr::include_graphics("images/Sankey agree with cons before after.png")
-```
-
----
-class: full
-
 ```{r echo=FALSE, out.width="70%"}
 knitr::include_graphics("images/wellbeing sankey.png")
 ```
