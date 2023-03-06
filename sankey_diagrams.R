@@ -119,6 +119,7 @@ ggplot(sankey, aes(x = x,
                label = node)) +
   geom_alluvial(flow.alpha = .6) +
   geom_alluvial_text(size = 3, color = "black") +
+  scale_color_brewer(palette = "Blues", direction = -1) +
   #scale_fill_viridis_d(option = "magma", direction = -1) +
   #scale_fill_manual(values = c("NA" = "#999999", "10" = "#999999"))%>% 
   theme_alluvial(base_size = 18) +
@@ -131,6 +132,7 @@ ggplot(sankey, aes(x = x,
         axis.title.y=element_blank(),
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
+  #scale_color_brewer(palette = "Blues", direction = -1) +
   ggtitle("Comparison of the leaseholders wellbeing \nbefore and after joining the conservancy")
 ggsave(filename = here::here("images", "wellbeing sankey.png"))
 
@@ -213,7 +215,7 @@ ggsave(filename = here::here("images", "activity_current1 (all).png"))
 ########################################################################################################################################################################################
 
 sankey <- hhs_wealth %>% 
-  select(stype, fpc, pw, sample, agree_before, agree_now)%>% #
+  select(stype, fpc, pw, sample, agree_before, agree_now)%>% 
   mutate(agree_before = fct_explicit_na(agree_before, na_level = "NA")) %>% 
   mutate(agree_now = fct_explicit_na(agree_now, na_level = "NA")) %>% 
   make_long(agree_before, agree_now) %>% 

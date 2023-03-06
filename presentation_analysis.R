@@ -402,7 +402,7 @@ a_before <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  filter(sample == "Enonkishu") %>% 
+  #filter(sample == "Enonkishu") %>% 
   na.omit()
 
 ggplot(a_before, aes(x=sample, y=proportion, group = agree_before, fill = agree_before)) +
@@ -414,11 +414,11 @@ ggplot(a_before, aes(x=sample, y=proportion, group = agree_before, fill = agree_
                     #name="Legend Title",
                     breaks=c("No", "Yes", "Don't Know", "NA"),
                     labels=c("No", "Yes", "Don't Know", "NA")) +
-  labs(title="cons agree before (NA omitted)",x="Conservancy", y = "Proportion of Households") +
+  labs(title="At the time that THIS conservancy was set up, \ndid the land title holder personally agree with \nthat decision?",x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 1)) +
-  theme_sjplot() + 
-  theme(legend.position=c(0.9,0.6))
-ggsave(filename = here::here("images", "agreed_with_cons_before (enonkishu NA_omit).png"))
+  cowplot::theme_half_open() + 
+  facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
+ggsave(filename = here::here("images", "agreed_with_cons_before.png"))
 
 a_now <- strat_design_srvyr_hhs %>% 
   mutate(agree_now = factor(agree_now, levels = c("No", "Yes", "<i>Don't Know</i>", NA), labels=c("No", "Yes", "Don't Know"))) %>% 
@@ -426,7 +426,7 @@ a_now <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  filter(sample == "Enonkishu") %>% 
+  #filter(sample == "Enonkishu") %>% 
   na.omit()
 
 ggplot(a_now, aes(x=sample, y=proportion, group = agree_now, fill = agree_now)) +
@@ -438,11 +438,11 @@ ggplot(a_now, aes(x=sample, y=proportion, group = agree_now, fill = agree_now)) 
                     #name="Legend Title",
                     breaks=c("No", "Yes", "<i>Don't Know</i>", "NA"),
                     labels=c("No", "Yes", "<i>Don't Know</i>", "NA")) +
-  labs(title="cons agree now (NA omitted)",x="Conservancy", y = "Proportion of Households") +
+  labs(title="Does the land title holder agree with the community's \ndecision to have THIS conservancy at the moment?",x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 1)) +
-  theme_sjplot() + 
-  theme(legend.position=c(0.9,0.6))
-ggsave(filename = here::here("images", "agreed_with_cons_now (enonkishu).png"))
+  cowplot::theme_half_open() + 
+  facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
+ggsave(filename = here::here("images", "agreed_with_cons_now.png"))
 
 #######################################################################################################################
 ####### Survey based graph of proportion of HHS and a number of different variables (can be adjusted with copy paste)
