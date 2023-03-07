@@ -105,9 +105,9 @@ In the next slides we discuss the results of the study under the following theme
 
 
 ---
-class: full
+# Governance
 
-Governance
+The following slides will look at the land title holders perceptions of the state of governance in their respective conservancies.
 
 ---
 class: full
@@ -119,7 +119,7 @@ knitr::include_graphics("images/auth over conservancy.png")
 ---
 class: full
 
-```{r echo=FALSE, out.width="70%"}
+```{r echo=FALSE, out.width="60%"}
 knitr::include_graphics("images/inf in conservancy.png")
 ```
 
@@ -140,7 +140,7 @@ knitr::include_graphics("images/transparency in conservancy.png")
 ---
 class: full
 
-```{r echo=FALSE, out.width="70%"}
+```{r echo=FALSE, out.width="60%"}
 knitr::include_graphics("images/Use of Money in the Conservancy.png")
 ```
 
@@ -166,9 +166,9 @@ knitr::include_graphics("images/Sankey agree with cons before after.png")
 ```
 
 ---
-class: full
+# Well-being and Livelihoods
 
-Wellbeing and livelihoods
+The following slides will look at the land title holders perceptions of their state of well-being in their respective conservancies.
 
 ---
 class: full
@@ -180,28 +180,28 @@ knitr::include_graphics("images/Leaseholder Occupations.png")
 ---
 class: full
 
-```{r echo=FALSE, out.width="70%"}
+```{r echo=FALSE, out.width="60%"}
 knitr::include_graphics("images/level of education completed.png")
 ```
 
 ---
 class: full
 
-```{r echo=FALSE, out.width="70%"}
+```{r echo=FALSE, out.width="60%"}
 knitr::include_graphics("images/education access.png")
 ```
 
 ---
 class: full
 
-```{r echo=FALSE, out.width="70%"}
+```{r echo=FALSE, out.width="60%"}
 knitr::include_graphics("images/access_to_health.png")
 ```
 
 ---
 class: full
 
-```{r echo=FALSE, out.width="70%"}
+```{r echo=FALSE, out.width="60%"}
 knitr::include_graphics("images/access_to_electricity.png")
 ```
 
@@ -215,7 +215,14 @@ knitr::include_graphics("images/skip meals before after.png")
 ---
 class: full
 
-```{r echo=FALSE, out.width="70%"}
+```{r echo=FALSE, out.width="60%"}
+knitr::include_graphics("images/quality of life.png")
+```
+
+---
+class: full
+
+```{r echo=FALSE, out.width="60%", out.height= "100%"}
 knitr::include_graphics("images/level of mobility.png")
 ```
 
@@ -229,7 +236,7 @@ knitr::include_graphics("images/crops.png")
 ---
 class: full
 
-```{r echo=FALSE, out.width="70%"}
+```{r echo=FALSE, out.width="60%"}
 knitr::include_graphics("images/wildlife.png")
 ```
 
