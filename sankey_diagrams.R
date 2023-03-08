@@ -219,8 +219,8 @@ sankey <- hhs_wealth %>%
   mutate(agree_before = fct_explicit_na(agree_before, na_level = "NA")) %>% 
   mutate(agree_now = fct_explicit_na(agree_now, na_level = "NA")) %>% 
   make_long(agree_before, agree_now) %>% 
-  mutate(node = fct_relevel(node, "NA", "No", "Yes", "<i>Don't Know</i>"), 
-         next_node = fct_relevel(next_node, "NA", "No", "Yes", "<i>Don't Know</i>"))
+  mutate(node = fct_relevel(node, "NA", "No", "Yes", "Don't Know"), 
+         next_node = fct_relevel(next_node, "NA", "No", "Yes", "Don't Know"))
 
 ggplot(sankey, aes(x = x, 
                    next_x = next_x, 
@@ -237,8 +237,8 @@ ggplot(sankey, aes(x = x,
   theme(legend.position = "none",
         plot.title = element_text(hjust = .5),
         axis.title.x=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.ticks.x=element_blank(),
         axis.title.y=element_blank(),
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
