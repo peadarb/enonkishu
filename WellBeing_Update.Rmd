@@ -104,7 +104,7 @@ An ethics document was developed and translated. The research assistant then had
 * Access to amenities such as education, health and electricity has also been enhanced with over 50% the land title holders being happy about this.
 * Acceptance of wildlife in the northern conservancies is quite high with 75% of the respondents expressing positive feelings about the wildlife.
 * Rules about grazing, forest use and settlement have been widely accepted and the landowners feel that they have brought a positive impact.
-
+* Accpetance of the conservancies has improved with over 90% of those interviewed accepting that conservancies have improved their well-being
 
 ---
 # Results
@@ -171,7 +171,7 @@ knitr::include_graphics("images/agreed_with_cons_now.png")
 ---
 class: full
 
-```{r echo=FALSE, out.width= "70%"}
+```{r echo=FALSE, fig.cap= "At the time that THIS conservancy was set up, did the land title holder personally agree with that decision? Does the land title holder agree with the community's decision to have THIS conservancy at the moment?", out.width= "60%"}
 knitr::include_graphics("images/Sankey agree with cons before after.png")
 ```
 

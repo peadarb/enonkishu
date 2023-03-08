@@ -220,7 +220,11 @@ sankey <- hhs_wealth %>%
   mutate(agree_now = fct_explicit_na(agree_now, na_level = "NA")) %>% 
   make_long(agree_before, agree_now) %>% 
   mutate(node = fct_relevel(node, "NA", "No", "Yes", "Don't Know"), 
-         next_node = fct_relevel(next_node, "NA", "No", "Yes", "Don't Know"))
+         next_node = fct_relevel(next_node, "NA", "No", "Yes", "Don't Know")) %>%
+  mutate(node = factor(node,      levels = c("NA", "No", "Yes", "<i>Don't Know</i>"),
+                       labels=c("NA", "No", "Yes", "Don't Know"))) %>%
+  mutate(next_node = factor(next_node,      levels = c("NA", "No", "Yes", "<i>Don't Know</i>"),
+                            labels=c("NA", "No", "Yes", "Don't Know")))
 
 ggplot(sankey, aes(x = x, 
                    next_x = next_x, 
@@ -233,14 +237,14 @@ ggplot(sankey, aes(x = x,
   #scale_fill_viridis_d(option = "magma", direction = -1) +
   #scale_fill_manual(values = c("NA" = "#999999", "10" = "#999999"))%>% 
   theme_alluvial(base_size = 18) +
-  labs(xlab = NULL, ylab = NULL) +
+  labs(xlab = NULL, ylab = "Number of Respondents") +
   theme(legend.position = "none",
         plot.title = element_text(hjust = .5),
         axis.title.x=element_blank(),
         #axis.text.x=element_blank(),
         #axis.ticks.x=element_blank(),
-        axis.title.y=element_blank(),
-        axis.text.y=element_blank(),
+        #axis.title.y=element_blank(),
+        #axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
   ggtitle("Change in acceptance of conservancies \nbefore their establishment and now")
 ggsave(filename = here::here("images", "Sankey agree with cons before after.png"))
