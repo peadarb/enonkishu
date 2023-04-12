@@ -8,6 +8,7 @@ library(stats4)
 library(survey)
 library(srvyr, warn.conflicts = FALSE)
 library(sjPlot)
+library(cowplot)
 ggsave <- function(..., bg = 'white') ggplot2::ggsave(..., bg = bg)
 
 ######################################################################################################################
@@ -32,6 +33,26 @@ strat_design_srvyr_hhs <- hhs_wealth %>%
       sample == "Ol Chorro" ~ "Other northern conservancies",
       sample == "Outside" ~ "No conservancy")) %>% 
   mutate(
+    livestock = case_when(
+      livestock == "Strongly agree" ~ "Agree",
+      livestock == "Agree" ~ "Agree",
+      livestock == "Neutral" ~ "Neutral",
+      livestock == "Disagree" ~ "Disagree",
+      livestock == "Strongly disagree" ~ "Disagree")) %>% 
+  mutate(
+    livestock_future = case_when(
+      livestock_future == "Very bad" ~ "Bad",
+      livestock_future == "Bad" ~ "Bad",
+      livestock_future == "Good" ~ "Good",
+      livestock_future == "Very good" ~ "Good")) %>% 
+  mutate(
+    wild_perception = case_when(
+      wild_perception == "Strongly like" ~ "Like",
+      wild_perception == "Like" ~ "Like",
+      wild_perception == "Neutral" ~ "Neutral",
+      wild_perception == "Strongly dislike" ~ "Dislike",
+      wild_perception == "<i>Don't Know</i>" ~ "<i>Don't Know</i>")) %>% 
+  mutate(
     fpc = case_when(
       sample == "Mbokishi" ~ 361,
       sample == "Enonkishu" ~ 27,
@@ -47,7 +68,7 @@ strat_design_srvyr_hhs <- hhs_wealth %>%
                                                                       transparency, accountability, women_power, wild_perception, 
                                                                       activity_before1, activity_current1, wellbeing_before, wellbeing_after,
                                                                       agree_before, agree_now, total_before_tlu, total_now_tlu,
-                                                                      culture, culture_future, livestock, livestock_future)) %>% 
+                                                                      culture, culture_future, livestock, livestock_future, hhnum_tourism, hhnum_conserve)) %>% 
   #mutate(women_power = fct_relevel(women_power, "Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer"))
   mutate(skip_meal_after = fct_relevel(skip_meal_after, "NA", "Never", "Only a few days in the worst months", "Some days in every month", "Some days in every week"))
 
@@ -61,14 +82,14 @@ a <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(stype == "Enonkishu") %>% 
   mutate(transparency = factor(transparency, 
                                levels = c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "<i>Don't Know</i>"), 
                                labels=c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "Don't Know"))) %>% 
   na.omit() 
-#write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
+#write.xlsx(a, here::here("images", "transparency_enon.xlsx"))
 
-ggplot(a, aes(x=stype, y=proportion, group = transparency, fill = transparency)) +
+a_plot <- ggplot(a, aes(x=stype, y=proportion, group = transparency, fill = transparency)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
   geom_errorbar(data=a, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
@@ -82,31 +103,35 @@ ggplot(a, aes(x=stype, y=proportion, group = transparency, fill = transparency))
   #                      breaks=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer"),
   #                      labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
   #                      labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer")) +
-  labs(title = "Are you satisfied with the transparency of decision making?", x="Conservancy", y = "Proportion of Households") +
+  #labs(title = "Are you satisfied with the transparency of decision making?", x="Conservancy", y = "Proportion of Households") +
+  labs(x="Transparency of decision making", y = "Proportion of landowners") +
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
-  theme(legend.position=c(0.9,0.9))
-ggsave(filename = here::here("images/paper", "transparency (enonkishu vs other conservancies vs outside).png"))
+  theme(legend.position=c(0.9,0.9), axis.text.x=element_blank())
+
+a_plot
+
+#ggsave(filename = here::here("images/paper", "transparency (enonkishu vs other conservancies vs outside).png"))
 
 #######################################################################################################################
 ####### accountability
 ######################################################################################################################
 
-a <- strat_design_srvyr_hhs %>% 
+b <- strat_design_srvyr_hhs %>% 
   group_by(stype, accountability) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(stype == "Enonkishu") %>% 
   mutate(accountability = factor(accountability, 
                                  levels = c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "<i>Don't Know</i>"), 
                                  labels=c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "Don't Know"))) %>% 
   na.omit() 
-#write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
+#write.xlsx(a, here::here("images", "accountability_enon.xlsx"))
 
-ggplot(a, aes(x=stype, y=proportion, group = accountability, fill = accountability)) +
+b_plot <- ggplot(b, aes(x=stype, y=proportion, group = accountability, fill = accountability)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
-  geom_errorbar(data=a, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+  geom_errorbar(data=b, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
   scale_fill_manual(values=c("#0047AB","#6FAFCA","tan3", "#cd3700", "#DFDFDF"), 
@@ -118,33 +143,37 @@ ggplot(a, aes(x=stype, y=proportion, group = accountability, fill = accountabili
   #                      breaks=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer"),
   #                      labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
   #                      labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer")) +
-  labs(title = "Are you satisfied with the  level of accountability in decision making?", x="Conservancy", y = "Proportion of Households") +
+#  labs(title = "Are you satisfied with the level of accountability in decision making?", x="Conservancy", y = "Proportion of Households") +
+  labs(x="Accountability in decision making", y = "Proportion of landowners") +
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
-  theme(legend.position=c(0.9,0.9))
-ggsave(filename = here::here("images/paper", "accountability (enonkishu vs other conservancies vs outside).png"))
+  theme(legend.position=c(0.9,0.9), axis.text.x=element_blank())
+
+b_plot
+#ggsave(filename = here::here("images/paper", "accountability (enonkishu vs other conservancies vs outside).png"))
 
 #######################################################################################################################
 ####### influence
 ######################################################################################################################
 
-a <- strat_design_srvyr_hhs %>% 
+c <- strat_design_srvyr_hhs %>% 
   group_by(stype, influence) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
+  filter(stype == "Enonkishu") %>% 
   mutate(influence = factor(influence, 
                                  levels = c("A lot of influence","A little influence","No influence", "I do not want to answer", "<i>Don't Know</i>"), 
                                  labels=c("A lot of influence","A little influence","No influence", "Don't want to answer", "Don't Know"))) %>% 
   na.omit() 
-#write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
+#write.xlsx(a, here::here("images", "influence_enon.xlsx"))
 
-ggplot(a, aes(x=stype, y=proportion, group = influence, fill = influence)) +
+c_plot <- ggplot(c, aes(x=stype, y=proportion, group = influence, fill = influence)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
-  geom_errorbar(data=a, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+  geom_errorbar(data=c, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
-  scale_fill_manual(values=c("#0047AB","#6FAFCA","tan3", "darkgrey", "#DFDFDF"), 
+  scale_fill_manual(values=c("#026206","#97D39A","#C597D3", "darkgrey", "#DFDFDF"), 
                     #name="Legend Title",
                     breaks=c("A lot of influence","A little influence","No influence", "Don't want to answer", "Don't Know"),
                     labels=c("A lot of influence","A little influence","No influence", "Don't want to answer", "Don't Know")) +
@@ -153,17 +182,21 @@ ggplot(a, aes(x=stype, y=proportion, group = influence, fill = influence)) +
   #                      breaks=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer"),
   #                      labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
   #                      labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer")) +
-  labs(title = "How much influence do you feel this household has in decision making in conservancy?", x="Conservancy", y = "Proportion of Households") +
+  #labs(title = "How much influence do you feel this household has in decision making in conservancy?", x="Conservancy", y = "Proportion of Households") +
+  labs(x="Influence in decision making", y = "Proportion of landowners") +
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
-  theme(legend.position=c(0.85,0.8))
-ggsave(filename = here::here("images/paper", "influence (enonkishu vs other conservancies vs outside).png"))
+  theme(legend.position=c(0.85,0.8), axis.text.x=element_blank())
 
+c_plot
+#ggsave(filename = here::here("images/paper", "influence (enonkishu vs other conservancies vs outside).png"))
+
+cowplot::plot_grid(a_plot, b_plot, c_plot, labels = "auto")
 #######################################################################################################################
 ####### authority
 ######################################################################################################################
 
-a <- strat_design_srvyr_hhs %>% 
+d <- strat_design_srvyr_hhs %>% 
   group_by(stype, conserve_authority) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
@@ -174,9 +207,9 @@ a <- strat_design_srvyr_hhs %>%
   na.omit() 
 #write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
 
-ggplot(a, aes(x=stype, y=proportion, group = conserve_authority, fill = conserve_authority)) +
+ggplot(d, aes(x=stype, y=proportion, group = conserve_authority, fill = conserve_authority)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
-  geom_errorbar(data=a, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+  geom_errorbar(data=d, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
   scale_fill_manual(values=c("#0047AB","#6FAFCA","tan3", "#DFDFDF"), 
@@ -187,7 +220,7 @@ ggplot(a, aes(x=stype, y=proportion, group = conserve_authority, fill = conserve
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
   theme(legend.position=c(0.75,0.8))
-ggsave(filename = here::here("images/paper", "authority (enonkishu vs other conservancies vs outside).png"))
+#ggsave(filename = here::here("images/paper", "authority (enonkishu vs other conservancies vs outside).png"))
 
 #######################################################################################################################
 ####### informed about income
@@ -322,15 +355,22 @@ table <- strat_design_srvyr_hhs %>%
   na.omit() 
 write.xlsx(table, here::here("images/paper", "grazing rules yes or no.xlsx"))
 
-a <- strat_design_srvyr_hhs %>% 
+x <- strat_design_srvyr_hhs %>% 
+  filter(stype == "Enonkishu") %>% 
+  mutate(
+    graz_rules_help = case_when(
+      graz_rules_help == "Brought much help" ~ "Helpful",
+      graz_rules_help == "Brought Help" ~ "Helpful",
+      graz_rules_help == "<i>Don't Know</i>" ~ "Don't Know",
+      graz_rules_help == "Made no difference" ~ "No difference",
+      graz_rules_help == "Brought problems" ~ "Problematic")) %>% 
   group_by(stype, graz_rules_help) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
-  mutate(graz_rules_help = factor(graz_rules_help, 
-                                    levels = c("Brought much help","Brought Help","Brought problems", "Made no difference", "<i>Don't Know</i>"), 
-                                    labels=c("Very helpful","Helpful","Problematic", "Very problematic", "Don't Know"))) %>% 
+#  mutate(graz_rules_help = factor(graz_rules_help, 
+#                                    levels = c("Brought much help","Brought Help","Brought problems", "Made no difference", "<i>Don't Know</i>"), 
+#                                    labels=c("Very helpful","Helpful","Problematic", "Very problematic", "Don't Know"))) %>% 
   na.omit() 
 #write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
 
@@ -427,7 +467,7 @@ ggsave(filename = here::here("images/paper", "wildlife perceptions (enonkishu vs
 ####### women and power
 ######################################################################################################################
 
-a <- strat_design_srvyr_hhs %>% 
+e <- strat_design_srvyr_hhs %>% 
   group_by(stype, women_power) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
@@ -438,9 +478,9 @@ a <- strat_design_srvyr_hhs %>%
   na.omit() 
 #write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
 
-ggplot(a, aes(x=stype, y=proportion, group = women_power, fill = women_power)) +
+ggplot(e, aes(x=stype, y=proportion, group = women_power, fill = women_power)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
-  geom_errorbar(data=a, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+  geom_errorbar(data=e, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
   scale_fill_manual(values=c("#0047AB","#6FAFCA", "tan3", "#cd3700",  "darkgrey", "#DFDFDF"), 
@@ -451,7 +491,7 @@ ggplot(a, aes(x=stype, y=proportion, group = women_power, fill = women_power)) +
   scale_y_continuous(limits=c(0, 1)) +
   theme_sjplot() + 
   theme(legend.position=c(0.85,0.85))
-ggsave(filename = here::here("images/paper", "women and power (enonkishu vs other conservancies vs outside).png"))
+#ggsave(filename = here::here("images/paper", "women and power (enonkishu vs other conservancies vs outside).png"))
 
 #######################################################################################################################
 ####### activity before/after
@@ -590,10 +630,10 @@ a <- strat_design_srvyr_hhs %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   #filter(sample == "Enonkishu") %>% 
-  mutate(livestock = factor(livestock, 
+ mutate(livestock = factor(livestock, 
                           levels = c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree"), 
-                          labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree"))) %>% 
-  na.omit() 
+                         labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree"))) 
+  #na.omit() 
 #write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
 
 ggplot(a, aes(x=stype, y=proportion, group = livestock, fill = livestock)) +
@@ -653,8 +693,8 @@ a <- strat_design_srvyr_hhs %>%
   #filter(sample == "Enonkishu") %>% 
   mutate(livestock_future = factor(livestock_future, 
                                  levels = c("Very good", "Good", "Bad", "Very bad"), 
-                                 labels=c("Very good", "Good", "Bad", "Very bad"))) %>% 
-  na.omit() 
+                                 labels=c("Very good", "Good", "Bad", "Very bad")))
+#  na.omit() 
 #write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
 
 ggplot(a, aes(x=stype, y=proportion, group = livestock_future, fill = livestock_future)) +
@@ -708,3 +748,105 @@ ggplot(data = map) +
   geom_sf(data = map, fill=alpha("red",0.2), show.legend = TRUE) +
   coord_sf(label_graticule = "SW", expand = FALSE) +
   ggtitle("Locations of sampled households")
+
+#######################################################################################################################
+####### hhnum_tourism
+######################################################################################################################
+
+a <- strat_design_srvyr_hhs %>% 
+  group_by(stype, hhnum_tourism) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) #%>% 
+#  filter(sample == "Enonkishu") %>% 
+#  mutate(transparency = factor(transparency, 
+#                               levels = c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "<i>Don't Know</i>"), 
+#                               labels=c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "Don't Know"))) %>% 
+#  na.omit() 
+#write.xlsx(a, here::here("images", "transparency_enon.xlsx"))
+
+
+#######################################################################################################################
+####### hhnum_conserve
+######################################################################################################################
+
+b <- strat_design_srvyr_hhs %>% 
+  group_by(stype, hhnum_conserve) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) #%>% 
+#  filter(sample == "Enonkishu") %>% 
+#  mutate(transparency = factor(transparency, 
+#                               levels = c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "<i>Don't Know</i>"), 
+#                               labels=c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "Don't Know"))) %>% 
+#  na.omit() 
+#write.xlsx(a, here::here("images", "transparency_enon.xlsx"))
+
+
+#######################################################################################################################
+####### combined
+######################################################################################################################
+
+
+#influence (c - different legend, transparency (a), accountability (b)
+   
+transparency2 <- strat_design_srvyr_hhs %>% 
+  group_by(stype, transparency) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  mutate(transparency = factor(transparency, 
+                               levels = c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "<i>Don't Know</i>"), 
+                               labels=c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "Don't Know"))) %>% 
+  na.omit() %>% 
+  mutate("transparency" ~ "variable")
+
+#write.xlsx(a, here::here("images", "transparency_enon.xlsx"))
+
+accountability2 <- strat_design_srvyr_hhs %>% 
+  group_by(stype, accountability) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  #filter(sample == "Enonkishu") %>% 
+  mutate(accountability = factor(accountability, 
+                                 levels = c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "<i>Don't Know</i>"), 
+                                 labels=c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "Don't Know"))) %>% 
+  na.omit() %>% 
+  mutate("accountability")
+  
+influence2 <- strat_design_srvyr_hhs %>% 
+  group_by(stype, influence) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  mutate(influence = factor(influence, 
+                            levels = c("A lot of influence","A little influence","No influence", "I do not want to answer", "<i>Don't Know</i>"), 
+                            labels=c("A lot of influence","A little influence","No influence", "Don't want to answer", "Don't Know"))) %>% 
+  na.omit()  %>% 
+  mutate("influence")
+
+combine <- full_join(accountability2, transparency2)
+# combine the 3
+#write.xlsx(a, here::here("images", "influence_enon.xlsx"))
+
+ggplot(a, aes(x=stype, y=proportion, group = transparency, fill = transparency)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
+  geom_errorbar(data=a, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
+                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
+  guides(fill=guide_legend(title=NULL)) +
+  scale_fill_manual(values=c("#0047AB","#6FAFCA","tan3", "#cd3700", "#DFDFDF"), 
+                    #name="Legend Title",
+                    breaks=c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "<i>Don't Know</i>"),
+                    labels=c("Very satisfied","Satisfied","Unsatisfied", "Very unsatisfied", "Don't Know")) +
+  #  scale_fill_manual(values=c("#008b45","#6FAFCA","yellow3", "tan3", "#cd3700", "#DFDFDF" , "#999999"), 
+  #                      #name="Legend Title",
+  #                      breaks=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer"),
+  #                      labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+  #                      labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer")) +
+  labs(title = "Are you satisfied with the transparency of decision making?", x="Conservancy", y = "Proportion of Households") +
+  scale_y_continuous(limits=c(0, 1)) +
+  theme_sjplot() + 
+  theme(legend.position=c(0.9,0.9))
+#ggsave(filename = here::here("images/paper", "transparency (enonkishu vs other conservancies vs outside).png"))
