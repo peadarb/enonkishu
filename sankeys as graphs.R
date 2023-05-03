@@ -7,6 +7,7 @@ library(forcats)
 library(survey)
 library(srvyr, warn.conflicts = FALSE)
 library(sjPlot)
+library(stringr)
 #ggsave <- function(..., bg = 'white') ggplot2::ggsave(..., bg = bg)
 
 
@@ -36,29 +37,33 @@ sankey <- hhs_wealth %>%
          activity_current1, activity_current2, activity_current3, skip_meal_after,
          cow_before, sheep_before, goat_before, donkey_before, 
          cow_now, sheep_now, goat_now, donkey_now,
-         agree_before, agree_now, total_before_tlu, total_now_tlu)%>% 
+         agree_before, agree_now, total_before_tlu, total_now_tlu)%>%
+  filter(sample == "Enonkishu") %>% 
+  na.omit() %>%
   make_long(wellbeing_before, wellbeing_after) %>% 
-  mutate(node = fct_relevel(node, "NA", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), 
-         next_node = fct_relevel(next_node, "NA", "1", "2","3", "4", "5", "6", "7", "8", "9", "10"))
 
-wellbeing <- sankey %>%
-  mutate(node = as.numeric(node)) 
-  
+
+wellbeing$x<- factor(wellbeing$x, levels = c("Before Enonkishu", "After Enonkishu"))
+
+
 wellbeing_bar <- ggplot()+
-  geom_boxplot(data = wellbeing, aes(x = x, y = node, col = "red")) +
-  #scale_fill_brewer(palette="Dark2")
+  geom_boxplot(data = wellbeing, aes(x =x, y = node, col = "red")) +
   theme_alluvial(base_size = 15) +
-  labs(xlab = NULL, ylab = "Count") +
+  labs(xlab = NULL, y = "Count") +
   theme(legend.position = "none",
         plot.title = element_text(hjust = .5),
         axis.title.x=element_blank(),
         axis.title.y=element_blank()) +
-  ggtitle("Comparison of the leaseholders wellbeing \nbefore and after joining the conservancy") +
+  #scale_color_grey () +
+  ggtitle("Self-assessed Wellbeing") +
   ylim(0,10)
 
 wellbeing_bar
 
-cowplot::save_plot("images/wellbeing boxplot.png", wellbeing_bar)
+ggsave(filename = here::here("images", "wellbeing box enonkishu.png"))
+
+
+cowplot::save_plot("images/wellbeing boxplot enon.png", wellbeing_bar)
 
 ########################################################################################################################################################################################
 ########    skipping meals before after as graph ####################################################################################################################################
