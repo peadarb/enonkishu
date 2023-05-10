@@ -918,15 +918,15 @@ ggsave(filename = here::here("images", "wildlife.png"))
 #######################################################################################################################
 ####### Survey based graph of proportion of HHS and a number of different variables (Employment Status per Conservancy)
 ######################################################################################################################
+as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, roof, wall, mobility, sample))
 
-
-strat_design_srvyr_house <- hhs_wealth %>% 
-  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, occupation)) 
+strat_design_srvyr_occ <- hhs_wealth %>% 
+  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, occupation, sample)) 
 #add weights=~pw to include weights which are      total in strata/number sampled in strata
-strat_design_srvyr_house
+strat_design_srvyr_occ
 
-each_conserve_occupation <- strat_design_srvyr_house %>% 
-  group_by(stype, occupation) %>% 
+each_conserve_occupation <- strat_design_srvyr_occ %>% 
+  group_by(sample, occupation) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>%

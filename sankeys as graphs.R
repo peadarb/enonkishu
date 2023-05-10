@@ -38,13 +38,13 @@ sankey <- hhs_wealth %>%
          cow_before, sheep_before, goat_before, donkey_before, 
          cow_now, sheep_now, goat_now, donkey_now,
          agree_before, agree_now, total_before_tlu, total_now_tlu)%>%
-  filter(sample == "Enonkishu") %>% 
+  #filter(sample == "Enonkishu") %>% 
   na.omit() %>%
-  make_long(wellbeing_before, wellbeing_after) %>% 
+  make_long(wellbeing_before, wellbeing_after) %>%
+  mutate(node = as.numeric(node))  
 
-
-wellbeing$x<- factor(wellbeing$x, levels = c("Before Enonkishu", "After Enonkishu"))
-
+wellbeing <- sankey 
+levels(wellbeing$x) <- c("Before Joining Conservancy", "After Joining Conservancy")
 
 wellbeing_bar <- ggplot()+
   geom_boxplot(data = wellbeing, aes(x =x, y = node, col = "red")) +
@@ -55,15 +55,15 @@ wellbeing_bar <- ggplot()+
         axis.title.x=element_blank(),
         axis.title.y=element_blank()) +
   #scale_color_grey () +
-  ggtitle("Self-assessed Wellbeing") +
+  ggtitle("Self-assessed Wellbeing Across all Conservancies") +
   ylim(0,10)
 
 wellbeing_bar
 
-ggsave(filename = here::here("images", "wellbeing box enonkishu.png"))
+#ggsave(filename = here::here("images", "wellbeing box all.png"))
 
 
-cowplot::save_plot("images/wellbeing boxplot enon.png", wellbeing_bar)
+cowplot::save_plot("images/wellbeing boxplot all.png", wellbeing_bar)
 
 ########################################################################################################################################################################################
 ########    skipping meals before after as graph ####################################################################################################################################

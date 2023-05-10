@@ -225,8 +225,10 @@ sankey <- hhs_wealth %>%
                        labels=c("NA", "No", "Yes", "Don't Know"))) %>%
   mutate(next_node = factor(next_node,      levels = c("NA", "No", "Yes", "<i>Don't Know</i>"),
                             labels=c("NA", "No", "Yes", "Don't Know")))
+agree <- sankey 
+levels(agree$x) <- c("Before Joining Conservancy", "After Joining Conservancy")
 
-ggplot(sankey, aes(x = x, 
+ggplot(agree, aes(x = x, 
                    next_x = next_x, 
                    node = node, 
                    next_node = next_node,
@@ -247,9 +249,10 @@ ggplot(sankey, aes(x = x,
         #axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
   ggtitle("Change in acceptance of conservancies \nbefore their establishment and now")
+
 ggsave(filename = here::here("images", "Sankey agree with cons before after.png"))
 
-
+#cowplot::save_plot("images/sankey agree before after.png", agree)
 ########################################################################################################################################################################################
 ########  total TLU before after   ################################################################################################################################
 ########################################################################################################################################################################################
