@@ -259,19 +259,20 @@ strat_design_srvyr_house <- hhs_wealth %>%
 #add weights=~pw to include weights which are      total in strata/number sampled in strata
 strat_design_srvyr_house
 
-each_conserve_roof <- strat_design_srvyr_house %>% 
-  group_by(sample, roof) %>% 
-  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
-
-each_conserve_wall <- strat_design_srvyr_house %>% 
-  group_by(sample, wall) %>% 
-  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
-            #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
+# each_conserve_roof <- strat_design_srvyr_house %>% 
+#   group_by(sample, roof) %>% 
+#   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+#             #total = survey_total(vartype = "ci", na.rm=TRUE),
+#             n= unweighted(n()))
+# 
+# each_conserve_wall <- strat_design_srvyr_house %>% 
+#   group_by(sample, wall) %>% 
+#   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+#             #total = survey_total(vartype = "ci", na.rm=TRUE),
+#             n= unweighted(n()))
 
 each_conserve_mobility <- strat_design_srvyr_house %>% 
+  filter(sample == "Enonkishu") %>% 
   #mutate(mobility = factor(mobility, levels = c(1,2,3), 
   #                      labels=c("None", "Partial", "Whole"))) %>%  
   group_by(sample, mobility) %>% 
@@ -285,14 +286,14 @@ ggplot(each_conserve_mobility, aes(x=sample, y=proportion, fill = mobility)) +
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
   # scale_fill_manual(values=c("#D091BB", "#BBD4A6", "#DFDFDF"), 
-                    #name="Legend Title",
-                    #breaks=c("None", "Livestock only move", "I do not want to answer"),
-                    #labels=c("None", "Livestock only move", "I do not want to answer")) +
+  #name="Legend Title",
+  #breaks=c("None", "Livestock only move", "I do not want to answer"),
+  #labels=c("None", "Livestock only move", "I do not want to answer")) +
   labs(title="What is the level of relocating of the \nland titleholder's household to \naccess livestock grazing, but not \nduring a bad drought?",x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 1)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "level of mobility.png"))
+ggsave(filename = here::here("images", "level of mobility_enon.png"))
 
 ######################################################################################################################
 ############# Survey based household education level reached  ############
@@ -303,7 +304,8 @@ strat_design_srvyr_edu <- hhs_wealth %>%
 #add weights=~pw to include weights which are      total in strata/number sampled in strata
 strat_design_srvyr_edu
 
-each_conserve_edu <- strat_design_srvyr_edu %>% 
+each_conserve_edu <- strat_design_srvyr_edu %>%
+  filter(sample == "Enonkishu") %>% 
   group_by(sample, edu) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             #total = survey_total(vartype = "ci", na.rm=TRUE),
@@ -315,14 +317,14 @@ ggplot(each_conserve_edu, aes(x=sample, y=proportion, group = edu, fill = edu)) 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
   # scale_fill_manual(values=c("#F5B7B1", "#D091BB", "#A9CCE3", "#BBD4A6", "#FAD7A0", "#2E86C1", "#DFDFDF"), 
-                    #name="Legend Title",
-                    # breaks=c("None", "Adult literacy classes (Gumbaru)", "Primary", "Secondary", "Diploma", "Degree", "I do not want to answer"),
-                    # labels=c("None", "Adult literacy classes (Gumbaru)", "Primary", "Secondary", "Diploma", "Degree", "I do not want to answer")) +
+  #name="Legend Title",
+  # breaks=c("None", "Adult literacy classes (Gumbaru)", "Primary", "Secondary", "Diploma", "Degree", "I do not want to answer"),
+  # labels=c("None", "Adult literacy classes (Gumbaru)", "Primary", "Secondary", "Diploma", "Degree", "I do not want to answer")) +
   labs(title="What is the highest completed level of \neducation of the land title holder?",x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 1)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "level of education completed.png"))
+ggsave(filename = here::here("images", "level of education completed_enon.png"))
 
 ######################################################################################################################
 ############# Survey based household assets  ##############
@@ -368,6 +370,7 @@ strat_design_srvyr_gender <- hhs_wealth %>%
 
 ####for each asset ####
 each_conserve_gender <- strat_design_srvyr_gender %>% 
+  filter(sample == "Enonkishu") %>%
   group_by(sample, gender) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             #total = survey_total(vartype = "ci", na.rm=TRUE),
@@ -386,7 +389,7 @@ ggplot(each_conserve_gender, aes(x=sample, y=proportion, group = gender, fill = 
   scale_y_continuous(limits=c(0, 1)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "Gender of land title holder.png"))
+ggsave(filename = here::here("images", "Gender of land title holder_enon.png"))
 
 
 ######################################################################################################################
@@ -402,7 +405,7 @@ a_before <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit()
 
 ggplot(a_before, aes(x=sample, y=proportion, group = agree_before, fill = agree_before)) +
@@ -418,7 +421,7 @@ ggplot(a_before, aes(x=sample, y=proportion, group = agree_before, fill = agree_
   scale_y_continuous(limits=c(0, 1)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "agreed_with_cons_before.png"))
+ggsave(filename = here::here("images", "agreed_with_cons_before_enon.png"))
 
 a_now <- strat_design_srvyr_hhs %>% 
   mutate(agree_now = factor(agree_now, levels = c("No", "Yes", "<i>Don't Know</i>", NA), labels=c("No", "Yes", "Don't Know"))) %>% 
@@ -426,7 +429,7 @@ a_now <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit()
 
 ggplot(a_now, aes(x=sample, y=proportion, group = agree_now, fill = agree_now)) +
@@ -442,10 +445,7 @@ ggplot(a_now, aes(x=sample, y=proportion, group = agree_now, fill = agree_now)) 
   scale_y_continuous(limits=c(0, 1)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "agreed_with_cons_now.png"))
-
-
-
+ggsave(filename = here::here("images", "agreed_with_cons_now_enon.png"))
 
 
 #######################################################################################################################
@@ -468,7 +468,7 @@ a <- strat_design_srvyr_hhs %>%
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
   na.omit() 
-write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
+#write.xlsx(a, here::here("images", "skip_meal_after_all.xlsx"))
 
 
 ggplot(a, aes(x=sample, y=proportion, group = women_power, fill = women_power)) +
@@ -505,9 +505,9 @@ w <- strat_design_srvyr_hh %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
-write.xlsx(w, here::here("images", "women_power_all.xlsx"))
+#write.xlsx(w, here::here("images", "women_power_all.xlsx"))
 
 
 
@@ -517,15 +517,15 @@ ggplot(w, aes(x=sample, y=proportion, group = women_power, fill = women_power)) 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
   scale_fill_manual(values=c("#4d9221","#a1d76a","#f7f7f7", "#e9a3c9", "#c51b7d", "#808080", "#000000"), 
-  #                    #name="Legend Title",
-                      breaks=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer"), 
-  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
-                      labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
+                    #                    #name="Legend Title",
+                    breaks=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "<i>Don't Know</i>", "I do not want to answer"), 
+                    #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
   labs(title = "Do you agree with this statement: \nWomen have the power to influence decisions \nin this conservancy", x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "Women have the power.png"))
+ggsave(filename = here::here("images", "Women have the power_enon.png"))
 
 #######################################################################################################################
 ####### Survey based graph of proportion of HHS and a number of different variables (authority over conservancy)
@@ -546,9 +546,9 @@ aoc <- strat_design_srvyr_aoc %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
-write.xlsx(aoc, here::here("images", "authority_over_conservancy.xlsx"))
+#write.xlsx(aoc, here::here("images", "authority_over_conservancy.xlsx"))
 
 
 ggplot(aoc, aes(x=sample, y=proportion, group = conserve_authority, fill = conserve_authority)) +
@@ -556,22 +556,22 @@ ggplot(aoc, aes(x=sample, y=proportion, group = conserve_authority, fill = conse
   geom_errorbar(data=aoc, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
-    scale_fill_manual(values=c("#4d9221","#a1d76a","#e6f5d0","#808080"), 
-  #                    #name="Legend Title",
-                      breaks=c("All conservancy members","A small number of conservancy members","Conservancy management company", "<i>Don't Know</i>"),
-  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
-                      labels=c("All conservancy members","A small number of conservancy members","Conservancy management company", "Don't Know")) +
+  scale_fill_manual(values=c("#4d9221","#a1d76a","#e6f5d0","#808080"), 
+                    #                    #name="Legend Title",
+                    breaks=c("All conservancy members","A small number of conservancy members","Conservancy management company", "<i>Don't Know</i>"),
+                    #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+                    labels=c("All conservancy members","A small number of conservancy members","Conservancy management company", "Don't Know")) +
   labs(title = "Who has the authority over THIS conservancy?", x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "auth over conservancy.png"))
+ggsave(filename = here::here("images", "auth over conservancy_enon.png"))
 
 #######################################################################################################################
 ####### 38. Compare your life before and after land access payments were paid by the conservancy. Is your life?
 ######################################################################################################################
 
-strat_design_srvyr_hhs <- hhs_wealth %>% 
+strat_design_srvyr_bef <- hhs_wealth %>% 
   as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, sample, skip_meal_before, skip_meal_after, 
                                                                       occupation, access_edu, access_health, access_elec, access_water,
                                                                       crop_yn, conserve_authority, graz_hhcons, graz_rules, before_payment, graz_rules_help,
@@ -579,14 +579,14 @@ strat_design_srvyr_hhs <- hhs_wealth %>%
                                                                       water_rules, water_rules_help, wildlife_rules, wildlife_rules_help,
                                                                       receive_income, cons_payment_fct, income_informed, influence,
                                                                       transparency, accountability, women_power, wild_perception)) 
-  
+
 
 bef_pay <- strat_design_srvyr_bef %>% 
   group_by(sample, before_payment) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(aoc, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -605,7 +605,7 @@ ggplot(bef_pay, aes(x=sample, y=proportion, group = before_payment, fill = befor
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "quality of life.png"))
+ggsave(filename = here::here("images", "quality of life_enon.png"))
 
 #######################################################################################################################
 ####### Survey based graph of proportion of HHS and a number of different variables (HH influence in the conservancy)
@@ -617,7 +617,7 @@ inf <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -636,7 +636,7 @@ ggplot(inf, aes(x=sample, y=proportion, group = influence, fill = influence)) +
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "inf in conservancy.png"))
+ggsave(filename = here::here("images", "inf in conservancy_enon.png"))
 
 
 #######################################################################################################################
@@ -648,7 +648,7 @@ acct <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -659,15 +659,15 @@ ggplot(acct, aes(x=sample, y=proportion, group = accountability, fill = accounta
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
   scale_fill_manual(values=c("#4d9221","#a1d76a","#e9a3c9","#c51b7d","#808080"), 
-  #                    #name="Legend Title",
-                      breaks=c("Very satisfied","Satisfied","Unsatisfied","Very unsatisfied","<i>Don't Know</i>"),
-  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
-                      labels=c("Very satisfied","Satisfied","Unsatisfied","Very unsatisfied","Don't Know")) +
+                    #                    #name="Legend Title",
+                    breaks=c("Very satisfied","Satisfied","Unsatisfied","Very unsatisfied","<i>Don't Know</i>"),
+                    #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+                    labels=c("Very satisfied","Satisfied","Unsatisfied","Very unsatisfied","Don't Know")) +
   labs(title = "Are you satisfied with the level of accountability \nin THIS conservancy's decision making?", x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "accountability in conservancy.png"))
+ggsave(filename = here::here("images", "accountability in conservancy_enon.png"))
 
 
 #######################################################################################################################
@@ -679,7 +679,7 @@ trans <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -698,7 +698,7 @@ ggplot(trans, aes(x=sample, y=proportion, group = transparency, fill = transpare
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "transparency in conservancy.png"))
+ggsave(filename = here::here("images", "transparency in conservancy_enon.png"))
 
 
 #######################################################################################################################
@@ -710,7 +710,7 @@ money_use <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -721,15 +721,15 @@ ggplot(money_use, aes(x=sample, y=proportion, group = income_informed, fill = in
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
   scale_fill_manual(values=c("#c51b7d", "#4d9221", "#808080"), 
-  #                    #name="Legend Title",
-                     breaks=c("No","Yes","<i>Don't Know</i>"),
-  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
-                     labels=c("No","Yes","Don't Know")) +
+                    #                    #name="Legend Title",
+                    breaks=c("No","Yes","<i>Don't Know</i>"),
+                    #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+                    labels=c("No","Yes","Don't Know")) +
   labs(title = "Do you feel like the land title holder's \nhousehold is sufficiently informed about the \nuse of the money by the conservancy", x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "Use of Money in the Conservancy.png"))
+ggsave(filename = here::here("images", "Use of Money in the Conservancy_enon.png"))
 
 #######################################################################################################################
 ####### Survey based graph of proportion of HHS and a number of different variables (Employment Status per Conservancy)
@@ -740,7 +740,7 @@ occp <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -759,7 +759,7 @@ ggplot(occp, aes(x=sample, y=proportion, group = occupation, fill = occupation))
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "Leaseholder Occupations.png"))
+ggsave(filename = here::here("images", "Leaseholder Occupations_enon.png"))
 
 
 #######################################################################################################################
@@ -771,7 +771,7 @@ edu <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -790,7 +790,7 @@ ggplot(edu, aes(x=sample, y=proportion, group = access_edu, fill = access_edu)) 
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "education access.png"))
+ggsave(filename = here::here("images", "education access_enon.png"))
 
 
 #######################################################################################################################
@@ -802,7 +802,7 @@ health <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -821,7 +821,7 @@ ggplot(health, aes(x=sample, y=proportion, group = access_health, fill = access_
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "access_to_health.png"))
+ggsave(filename = here::here("images", "access_to_health_enon.png"))
 
 #######################################################################################################################
 ####### Survey based graph of proportion of HHS and a number of different variables (Access to electricity services)
@@ -832,7 +832,7 @@ elec <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -851,7 +851,7 @@ ggplot(elec, aes(x=sample, y=proportion, group = access_elec, fill = access_elec
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "access_to_electricity.png"))
+ggsave(filename = here::here("images", "access_to_electricity_enon.png"))
 
 
 #######################################################################################################################
@@ -863,7 +863,7 @@ crops <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -874,15 +874,15 @@ ggplot(crops, aes(x=sample, y=proportion, group = crop_yn, fill = crop_yn)) +
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
   scale_fill_manual(values=c("#c51b7d", "#4d9221","#808080"), 
-  #                    #name="Legend Title",
-                     breaks=c("No","Yes","I do not want to answer"),
-  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
-                     labels=c("No","Yes","I do not want to answer")) +
+                    #                    #name="Legend Title",
+                    breaks=c("No","Yes","I do not want to answer"),
+                    #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+                    labels=c("No","Yes","I do not want to answer")) +
   labs(title = "Has the land title holder's household cultivated \ncrops in the last year, here or elsewhere", x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "crops.png"))
+ggsave(filename = here::here("images", "crops_enon.png"))
 
 #######################################################################################################################
 ####### Survey based graph of proportion of HHS and a number of different variables (Wildlife Perception)
@@ -893,7 +893,7 @@ wildlife <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  #filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>% 
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -904,47 +904,236 @@ ggplot(wildlife, aes(x=sample, y=proportion, group = wild_perception, fill = wil
                 position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
   guides(fill=guide_legend(title=NULL)) +
   scale_fill_manual(values=c("#4d9221", "#e6f5d0", "#808080", "#c51b7d"), 
-  #                    #name="Legend Title",
-                      breaks=c("Strongly like","Like","Neutral", "Strongly dislike"),
-  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
-                      labels=c("Strongly like","Like","Neutral", "Strongly dislike")) +
+                    #                    #name="Legend Title",
+                    breaks=c("Strongly like","Like","Neutral", "Strongly dislike"),
+                    #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
+                    labels=c("Strongly like","Like","Neutral", "Strongly dislike")) +
   labs(title = "How do you feel about the wildlife living here", x="Conservancy", y = "Proportion of Households") +
   scale_y_continuous(limits=c(0, 0.9)) +
   cowplot::theme_half_open() + 
   facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "wildlife.png"))
+ggsave(filename = here::here("images", "wildlife_enon.png"))
 
 
-#######################################################################################################################
-####### Survey based graph of proportion of HHS and a number of different variables (Employment Status per Conservancy)
-######################################################################################################################
-as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, roof, wall, mobility, sample))
+########################################################################################################################################################################################
+########  agree with cons before after (enon sankey)   ################################################################################################################################
+########################################################################################################################################################################################
 
-strat_design_srvyr_occ <- hhs_wealth %>% 
-  as_survey_design(1, strata=stype, fpc=fpc, weight=pw, variables = c(stype, fpc, pw, occupation, sample)) 
-#add weights=~pw to include weights which are      total in strata/number sampled in strata
-strat_design_srvyr_occ
+sankey <- hhs_wealth %>% 
+  filter(sample == "Enonkishu") %>% 
+  select(stype, fpc, pw, sample, agree_before, agree_now)%>% 
+  mutate(agree_before = fct_explicit_na(agree_before, na_level = "NA")) %>% 
+  mutate(agree_now = fct_explicit_na(agree_now, na_level = "NA")) %>% 
+  make_long(agree_before, agree_now) %>% 
+  mutate(node = fct_relevel(node, "NA", "No", "Yes", "Don't Know"), 
+         next_node = fct_relevel(next_node, "NA", "No", "Yes", "Don't Know")) %>%
+  mutate(node = factor(node,      levels = c("NA", "No", "Yes", "<i>Don't Know</i>"),
+                       labels=c("NA", "No", "Yes", "Don't Know"))) %>%
+  mutate(next_node = factor(next_node,      levels = c("NA", "No", "Yes", "<i>Don't Know</i>"),
+                            labels=c("NA", "No", "Yes", "Don't Know")))
+agree <- sankey 
+levels(agree$x) <- c("Before Joining Conservancy", "After Joining Conservancy")
 
-each_conserve_occupation <- strat_design_srvyr_occ %>% 
+ggplot(agree, aes(x = x, 
+                  next_x = next_x, 
+                  node = node, 
+                  next_node = next_node,
+                  fill = factor(node), 
+                  label = node)) +
+  geom_alluvial(flow.alpha = .6) +
+  geom_alluvial_text(size = 3, color = "black") +
+  #scale_fill_viridis_d(option = "magma", direction = -1) +
+  #scale_fill_manual(values = c("NA" = "#999999", "10" = "#999999"))%>% 
+  theme_alluvial(base_size = 18) +
+  labs(xlab = NULL, ylab = "Number of Respondents") +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = .5),
+        axis.title.x=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.ticks.x=element_blank(),
+        #axis.title.y=element_blank(),
+        #axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  ggtitle("Change in acceptance of conservancies \nbefore their establishment and now")
+
+ggsave(filename = here::here("images", "Sankey agree with cons before after_enon.png"))
+
+########################################################################################################################################################################################
+########  agree with cons before after (enon boxplot)   ################################################################################################################################
+########################################################################################################################################################################################
+
+sankey_cons <- hhs_wealth %>% 
+  filter(sample == "Enonkishu") %>% 
+  select(stype, fpc, pw, sample, agree_before, agree_now)%>% 
+  mutate(agree_before = fct_explicit_na(agree_before, na_level = "NA")) %>% 
+  mutate(agree_now = fct_explicit_na(agree_now, na_level = "NA")) %>% 
+  make_long(agree_before, agree_now) %>% 
+  mutate(node = fct_relevel(node, "NA", "No", "Yes", "<i>Don't Know</i>"), 
+         next_node = fct_relevel(next_node, "NA", "No", "Yes", "<i>Don't Know</i>"))
+
+## As boxplot
+
+cons <- sankey_cons %>%
+  mutate(node = as.numeric(node)) 
+
+cons<- cons 
+levels(cons$x) <- c("Before Joining Conservancy", "After Joining Conservancy")
+
+cons_box <- ggplot()+
+  geom_boxplot(data = cons, aes(x = x, y = node, col = "red")) +
+  scale_fill_brewer(palette="Dark2") +
+  theme_alluvial(base_size = 13) +
+  labs(xlab = NULL, ylab = NULL) +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = .5),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank()) +
+  ggtitle("Change in acceptance of conservancies \nbefore their establishment and now") +
+  ylim(0,10)
+
+cons_box
+
+cowplot::save_plot("images/agree cons boxplot_enon.png", cons_box)
+
+########################################################################################################################################################################################
+########    skipping meals before after as graph ####################################################################################################################################
+########################################################################################################################################################################################
+
+sankey_meals <- hhs_wealth %>% 
+  filter(sample == "Enonkishu") %>%
+  select(stype, fpc, pw, sample, activity_before1, activity_before2, 
+         activity_before3, skip_meal_before, wellbeing_before, wellbeing_after,
+         activity_current1, activity_current2, activity_current3, skip_meal_after,
+         cow_before, sheep_before, goat_before, donkey_before, 
+         cow_now, sheep_now, goat_now, donkey_now,
+         agree_before, agree_now, total_before_tlu, total_now_tlu)%>% #
+  mutate(skip_meal_before = fct_explicit_na(skip_meal_before, na_level = "NA")) %>% 
+  mutate(skip_meal_after = fct_explicit_na(skip_meal_after, na_level = "NA")) %>% 
+  make_long(skip_meal_before, skip_meal_after) %>% 
+  mutate(node = fct_relevel(node, "NA", "Never", "Only a few days in the worst months", "Some days in every month", "Some days in every week"), 
+         next_node = fct_relevel(next_node, "NA", "Never", "Only a few days in the worst months", "Some days in every month", "Some days in every week"))
+
+
+## Box plot 
+meals <- sankey_meals %>%
+  mutate(node = as.numeric(node)) 
+
+meals2 <- meals 
+levels(meals2$x) <- c("Skip Meal Before", "Skip Meal After")
+
+meals_bar <- ggplot()+
+  geom_boxplot(data = meals2, aes(x = x, y = node, col = "red")) +
+  scale_fill_brewer(palette="Dark2") +
+  theme_alluvial(base_size = 10) +
+  labs(xlab = NULL, ylab = NULL) +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = .5),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank()) +
+  ggtitle("Rate of Leaseholders skipping meals \nbefore and after joining the conservancies") +
+  ylim(0,10)
+
+meals_bar
+
+cowplot::save_plot("images/skipping meals boxplot_enon.png", meals_bar)
+
+### Trying another visualization (bar graph)
+
+meals3 <- sankey_meals %>%
+  mutate(node = as.factor(node)) 
+
+meals4 <- meals3 
+levels(meals4$x) <- c("Skip Meal Before Joining", "Skip Meal After Joining")
+
+meals_bar <- ggplot()+
+  geom_bar(data = meals4, aes(x = x, fill = node, group = node), position = "dodge") +
+  #scale_fill_brewer(direction = -1) +
+  scale_fill_manual(values=c("#f7f7f7","#4d9221","#a1d76a","#e9a3c9", "#c51b7d", "#808080"), 
+                    breaks=c("NA", "Never", "Only a few days in the worst months", "Some days in every month", "Some days in every week", "I do not want to answer"),
+                    labels=c("NA", "Never", "Only a few days in the worst months", "Some days in every month", "Some days in every week", "I do not want to answer")) +
+  theme_alluvial(base_size = 10) +
+  labs(xlab = NULL, ylab = NULL) +
+  theme(legend.position = "right",
+        plot.title = element_text(hjust = .1),
+        legend.title = element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank()) +
+  ggtitle("Rate of Leaseholders skipping meals before and after \njoining the conservancies") +
+  ylim(0,25)
+
+meals_bar
+
+cowplot::save_plot("images/skipping meals bar_enon.png", meals_bar)
+
+########################################################################################################################################################################################
+########    wellbeing before after as graph ####################################################################################################################################
+########################################################################################################################################################################################
+
+sankey <- hhs_wealth %>% 
+  mutate(wellbeing_before = as.numeric(wellbeing_before)) %>% 
+  mutate(wellbeing_before = as.factor(wellbeing_before)) %>% 
+  mutate(wellbeing_before = fct_explicit_na(wellbeing_before, na_level = "NA")) %>% 
+  mutate(wellbeing_after = as.numeric(wellbeing_after)) %>% 
+  mutate(wellbeing_after = as.factor(wellbeing_after)) %>% 
+  mutate(wellbeing_after = fct_explicit_na(wellbeing_after, na_level = "NA")) %>% 
+  select(stype, fpc, pw, sample, activity_before1, activity_before2, 
+         activity_before3, skip_meal_before, wellbeing_before, wellbeing_after,
+         activity_current1, activity_current2, activity_current3, skip_meal_after,
+         cow_before, sheep_before, goat_before, donkey_before, 
+         cow_now, sheep_now, goat_now, donkey_now,
+         agree_before, agree_now, total_before_tlu, total_now_tlu)%>%
+  filter(sample == "Enonkishu") %>% 
+  na.omit() %>%
+  make_long(wellbeing_before, wellbeing_after) %>%
+  mutate(node = as.numeric(node))  
+
+wellbeing <- sankey 
+levels(wellbeing$x) <- c("Before Joining Conservancy", "After Joining Conservancy")
+
+wellbeing_bar <- ggplot()+
+  geom_boxplot(data = wellbeing, aes(x =x, y = node, col = "red")) +
+  theme_alluvial(base_size = 15) +
+  labs(xlab = NULL, y = "Count") +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = .5),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank()) +
+  #scale_color_grey () +
+  ggtitle("Self-assessed Wellbeing in Enonkishu") +
+  ylim(0,10)
+
+wellbeing_bar
+
+#ggsave(filename = here::here("images", "wellbeing box all.png"))
+
+
+cowplot::save_plot("images/wellbeing boxplot enon.png", wellbeing_bar)
+
+########################################################################################################################################################################################
+########   Leaseholder Occupation as totals ####################################################################################################################################
+########################################################################################################################################################################################
+
+occp <- strat_design_srvyr_hhs %>% 
   group_by(sample, occupation) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n())) %>%
-  na.omit()
+            n= unweighted(n())) %>% 
+  filter(sample == "Enonkishu") %>% 
+  na.omit() 
 
+occp_bar <- ggplot()+
+  geom_bar(data = occp, aes(x = occupation, fill = total, group = occupation), position = position_dodge()) +
+  # scale_fill_brewer(direction = -1) +
+  # theme_alluvial(base_size = 13) +
+  labs(xlab = NULL, ylab = NULL) +
+  theme(legend.position = "bottom",
+        plot.title = element_text(hjust = .1),
+        legend.title = element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank()) +
+  ggtitle("Number of people employed in various fields in Enonkishu Conservancy") 
+  #ylim(0,100)
 
-ggplot(each_conserve_occupation, aes(x=sample, y=proportion, group = occupation, fill = occupation)) +
-  geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
-  geom_errorbar(data=each_conserve_occupation, aes(ymax = ifelse(proportion_upp > 1, 1, proportion_upp), ymin = ifelse(proportion_low < 0, 0, proportion_low)), 
-                position = position_dodge(preserve = "single", width = 0.95), width = 0.1) +
-  guides(fill=guide_legend(title=NULL)) +
-  # scale_fill_manual(values=c("#fde0ef","#a1d76a","#f7f7f7", "#e6f5d0", "#c51b7d", "#e9a3c9", "#4d9221")) + 
-  #                    #name="Legend Title",
-  #                    breaks=c("1","2","3", "4", "5", "6"),
-  #                   labels=c("0 – KES 50,000","KES 50,001 – KES 100,000","KES100,001 – KES 150,000", "KES 150,001 – KES 200,000", "KES 200,001 – KES 250,000", "KES 250,000+")) +
-  #                    labels=c("Strongly agree","Agree","Neutral", "Disagree", "Strongly disagree", "Don't Know", "I do not want to answer")) +
-  labs(title = "Does the land title holder have an occupation? \nIf yes, what is land title holder's occupation?", x="Conservancy", y = "Proportion of Households") +
-  scale_y_continuous(limits=c(0, 0.9)) +
-  cowplot::theme_half_open() + 
-  facet_wrap(~sample, drop = T, ncol=1, scales = "free_y") + coord_flip()
-ggsave(filename = here::here("images", "Leaseholder Occupations2.png"))
+occp_bar
+
+cowplot::save_plot("images/occupation_totals.png", occp_bar)

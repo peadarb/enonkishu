@@ -1,5 +1,5 @@
 ---
-title: "Enonkishu Conservancies Social and Wellbeing Survey"
+title: "Enonkishu Conservancy Social and Wellbeing Survey"
 subtitle: "Exploring the Socioeconomic Impact of Enonkishu Conservancy on Landowners"
 author: "Dr. Peadar Brehony, Dr. Peter Tyrrell, Dr. Lauren Evans, Rebecca Karimi, Rose Muiyuro, Esther Kang'ethe"
 #institute: "Dascot Ltd.
@@ -19,7 +19,7 @@ output:
       ratio: "16:9"
 ---
 
-```{r include = FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(message = FALSE)
 knitr::opts_chunk$set(warning = FALSE)
@@ -31,7 +31,6 @@ knitr::opts_chunk$set(
   out.width = "50%",
   dpi= 300
 )
-
 ```
 
 ```{r libraries}
@@ -40,7 +39,6 @@ library(officer)
 library(gdtools)
 library(webshot)
 ```
-
 
 ```{r setting functions to produce individual formatted tables}
 std_border = fp_border(color="#000000", width = 2)
@@ -56,8 +54,6 @@ fontname <- "Calibri Light"
 * We assessed the members’ and non-members’ perspectives and  of the conservancies in the area, and important social and economic indicators. 
 
 * We developed questions that would help us deduce the respondents well-being before and after establishment of the conservancies.
-
-
 
 ---
 
@@ -99,12 +95,16 @@ An ethics document was developed and translated. The research assistant then had
 ---
 # Executive Summary
 
-* Comparing life before and after land access payments were paid by the conservancy, life was *a little better* for 31% of the respondents that participated, *a lot better for 15%*, *a little worse for 6%*, and *the same for 3%*. This shows an overall increased level of well-being and livelihood for the land title holders
-* The northern conservancies have improved food security for the land title holders with the rate of skipping meals being at almost never.
-* Access to amenities such as education, health and electricity has also been enhanced with over 50% the land title holders being happy about this.
-* Acceptance of wildlife in the northern conservancies is quite high with 75% of the respondents expressing positive feelings about the wildlife.
-* Rules about grazing, forest use and settlement have been widely accepted and the landowners feel that they have brought a positive impact.
-* Acceptance of the conservancies has improved with over 90% of those interviewed accepting that conservancies have improved their well-being
+* People generally believe that only a small number of people are in charge of making decisions.
+* That they as individuals have little to no influence. 
+* People are generally satisfied with the accountability and transparency of the governance.
+* However, they are unsatisfied on the knowledge of where funds are spent.
+* Women are perceived to have little to no power in the conservancy. 
+* All members agree with the conservancy being in place.
+* Majority of Enonkishu members are well educated.
+* Food security has generally increased since the conservancy was put in place. 
+* Everyone generally likes or strongly likes wildlife.
+* Most people report a large increase in their personal well-being since the conservancy was put in place.
 
 ---
 # Results
@@ -123,58 +123,63 @@ class: center
 class: full
 
 ```{r echo=FALSE, out.width="70%"}
-knitr::include_graphics("images/auth over conservancy.png")
+knitr::include_graphics("images/auth over conservancy_enon.png")
+```
+---
+class: full
+
+```{r echo=FALSE, out.width="60%"}
+knitr::include_graphics("images/inf in conservancy_enon.png")
+```
+
+---
+class: full
+
+```{r echo=FALSE, out.width="70%"}
+knitr::include_graphics("images/accountability in conservancy_enon.png")
+```
+
+---
+class: full
+
+```{r echo=FALSE, out.width="70%"}
+knitr::include_graphics("images/transparency in conservancy_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/inf in conservancy.png")
+knitr::include_graphics("images/Use of Money in the Conservancy_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="70%"}
-knitr::include_graphics("images/accountability in conservancy.png")
+knitr::include_graphics("images/women have the power_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="70%"}
-knitr::include_graphics("images/transparency in conservancy.png")
-```
-
----
-class: full
-
-```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/Use of Money in the Conservancy.png")
-```
-
----
-class: full
-
-```{r echo=FALSE, out.width="70%"}
-knitr::include_graphics("images/women have the power.png")
-```
-
----
-class: full
-
-```{r echo=FALSE, out.width="70%"}
-knitr::include_graphics("images/agreed_with_cons_now.png")
+knitr::include_graphics("images/agreed_with_cons_now_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width= "60%"}
-knitr::include_graphics("images/Sankey agree with cons before after.png")
+knitr::include_graphics("images/Sankey agree with cons before after_enon.png")
 ```
 
+---
+class: full
+
+```{r echo=FALSE, out.width= "60%"}
+knitr::include_graphics("images/agree cons boxplot_enon.png")
+```
 ---
 class: center 
 
@@ -184,75 +189,96 @@ class: center
 class: full
 
 ```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/Leaseholder Occupations.png")
+knitr::include_graphics("images/Leaseholder Occupations_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/level of education completed.png")
+knitr::include_graphics("images/occupation_totals.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/education access.png")
+knitr::include_graphics("images/level of education completed_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/access_to_health.png")
+knitr::include_graphics("images/education access_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/access_to_electricity.png")
+knitr::include_graphics("images/access_to_health_enon.png")
+```
+
+---
+class: full
+
+```{r echo=FALSE, out.width="60%"}
+knitr::include_graphics("images/access_to_electricity_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="90%"}
-knitr::include_graphics("images/skipping meals bar.png")
+knitr::include_graphics("images/skipping meals bar_enon.png")
+```
+
+---
+class: full
+
+```{r echo=FALSE, out.width="90%"}
+knitr::include_graphics("images/skipping meals boxplot_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/quality of life.png")
+knitr::include_graphics("images/quality of life_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="60%", out.height= "100%"}
-knitr::include_graphics("images/level of mobility.png")
+knitr::include_graphics("images/level of mobility_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="70%"}
-knitr::include_graphics("images/crops.png")
+knitr::include_graphics("images/crops_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/wildlife.png")
+knitr::include_graphics("images/wildlife_enon.png")
 ```
 
 ---
 class: full
 
 ```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/wellbeing boxplot all.png")
+knitr::include_graphics("images/wellbeing boxplot enon.png")
+```
+
+---
+class: full
+
+```{r echo=FALSE, out.width="60%"}
+knitr::include_graphics("images/wellbeing sankey enon.png")
 ```

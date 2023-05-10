@@ -85,8 +85,11 @@ sankey_meals <- hhs_wealth %>%
 meals <- sankey_meals %>%
   mutate(node = as.numeric(node)) 
 
+meals2 <- meals 
+levels(meals2$x) <- c("Skip Meal Before", "Skip Meal After")
+
 meals_bar <- ggplot()+
-  geom_boxplot(data = meals, aes(x = x, y = node, col = "red")) +
+  geom_boxplot(data = meals2, aes(x = x, y = node, col = "red")) +
   scale_fill_brewer(palette="Dark2") +
   theme_alluvial(base_size = 18) +
   labs(xlab = NULL, ylab = NULL) +
@@ -103,11 +106,14 @@ cowplot::save_plot("images/skipping meals boxplot.png", meals_bar)
 
 ### Trying another visualization
 
-meals2 <- sankey_meals %>%
+meals3 <- sankey_meals %>%
   mutate(node = as.factor(node)) 
 
+meals4 <- meals3 
+levels(meals4$x) <- c("Skip Meal Before Joining", "Skip Meal After Joining")
+
 meals_bar <- ggplot()+
-  geom_bar(data = meals2, aes(x = x, fill = node, group = node), position = "dodge") +
+  geom_bar(data = meals4, aes(x = x, fill = node, group = node), position = "dodge") +
   #scale_fill_brewer(direction = -1) +
   scale_fill_manual(values=c("#f7f7f7","#4d9221","#a1d76a","#e9a3c9", "#c51b7d", "#808080"), 
                     breaks=c("NA", "Never", "Only a few days in the worst months", "Some days in every month", "Some days in every week", "I do not want to answer"),
@@ -132,6 +138,7 @@ cowplot::save_plot("images/skipping meals bar.png", meals_bar)
 ########################################################################################################################################################################################
 
 sankey_cons <- hhs_wealth %>% 
+  #filter(sample == "Enonkishu") %>% 
   select(stype, fpc, pw, sample, agree_before, agree_now)%>% 
   mutate(agree_before = fct_explicit_na(agree_before, na_level = "NA")) %>% 
   mutate(agree_now = fct_explicit_na(agree_now, na_level = "NA")) %>% 

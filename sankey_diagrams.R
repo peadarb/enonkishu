@@ -289,3 +289,54 @@ ggplot(sankey, aes(x = x,
         axis.ticks.y=element_blank()) +
   ggtitle("Livestock TLY before after")
 ggsave(filename = here::here("images", "Sankey Livestock TLY before after.png"))
+
+
+########################################################################################################################################################################################
+########    improved wellbeing before after ####################################################################################################################################
+########################################################################################################################################################################################
+
+sankey_enon <- hhs_wealth %>% 
+  filter(sample == "Enonkishu") %>% 
+  mutate(wellbeing_before = as.numeric(wellbeing_before)) %>% 
+  mutate(wellbeing_before = as.factor(wellbeing_before)) %>% 
+  mutate(wellbeing_before = fct_explicit_na(wellbeing_before, na_level = "NA")) %>% 
+  mutate(wellbeing_after = as.numeric(wellbeing_after)) %>% 
+  mutate(wellbeing_after = as.factor(wellbeing_after)) %>% 
+  mutate(wellbeing_after = fct_explicit_na(wellbeing_after, na_level = "NA")) %>% 
+  select(stype, fpc, pw, sample, activity_before1, activity_before2, 
+         activity_before3, skip_meal_before, wellbeing_before, wellbeing_after,
+         activity_current1, activity_current2, activity_current3, skip_meal_after,
+         cow_before, sheep_before, goat_before, donkey_before, 
+         cow_now, sheep_now, goat_now, donkey_now,
+         agree_before, agree_now, total_before_tlu, total_now_tlu)%>% 
+  make_long(wellbeing_before, wellbeing_after) %>% 
+  mutate(node = fct_relevel(node, "NA", "4", "5", "6", "7", "8", "9", "10"), 
+         next_node = fct_relevel(next_node, "8", "9", "10"))
+
+sankey_enon <- sankey_enon
+levels(sankey_enon$x) <- c("Before Joining Conservancy", "After Joining Conservancy")
+
+ggplot(sankey_enon, aes(x = x, 
+                   next_x = next_x, 
+                   node = node, 
+                   next_node = next_node,
+                   fill = factor(node), 
+                   label = node)) +
+  geom_alluvial(flow.alpha = .6) +
+  geom_alluvial_text(size = 3, color = "white") +
+  #scale_fill_viridis_d(option = "magma", direction = -1) +
+  #scale_fill_manual(values = c("NA" = "#999999", "10" = "#999999"))%>% 
+  theme_alluvial(base_size = 18) +
+  labs(xlab = NULL, ylab = NULL) +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = .5),
+        axis.title.x=element_blank(),
+        #axis.text.x=element_blank(),
+        #axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  scale_fill_viridis_d(option = "D", alpha = 0.95) + 
+  theme(plot.title = element_text(size=10)) +
+  ggtitle("1-10 score of life before leases were paid by the conservancy and now")
+ggsave(filename = here::here("images", "wellbeing sankey enon.png"))
