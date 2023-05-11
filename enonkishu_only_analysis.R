@@ -8,6 +8,7 @@ library(stats4)
 library(survey)
 library(srvyr, warn.conflicts = FALSE)
 library(sjPlot)
+library(forcats)
 
 
 
@@ -506,6 +507,7 @@ w <- strat_design_srvyr_hh %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(women_power = fct_reorder(women_power, proportion)) %>%
   na.omit() 
 #write.xlsx(w, here::here("images", "women_power_all.xlsx"))
 
@@ -547,6 +549,7 @@ aoc <- strat_design_srvyr_aoc %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(conserve_authority = fct_reorder(conserve_authority, proportion)) %>%
   na.omit() 
 #write.xlsx(aoc, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -587,6 +590,7 @@ bef_pay <- strat_design_srvyr_bef %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(before_payment = fct_reorder(before_payment, proportion)) %>%
   na.omit() 
 #write.xlsx(aoc, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -618,6 +622,7 @@ inf <- strat_design_srvyr_hhs %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(influence = fct_reorder(influence, proportion)) %>%
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -649,6 +654,7 @@ acct <- strat_design_srvyr_hhs %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(accountability = fct_reorder(accountability, proportion)) %>%
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -680,6 +686,7 @@ trans <- strat_design_srvyr_hhs %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(transparency = fct_reorder(transparency, proportion)) %>%
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -711,6 +718,7 @@ money_use <- strat_design_srvyr_hhs %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(income_informed = fct_reorder(income_informed, proportion)) %>%
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -741,6 +749,7 @@ occp <- strat_design_srvyr_hhs %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(occupation = fct_reorder(occupation, proportion)) %>%
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -772,6 +781,7 @@ edu <- strat_design_srvyr_hhs %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(access_edu = fct_reorder(access_edu, proportion)) %>%
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -803,6 +813,7 @@ health <- strat_design_srvyr_hhs %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(access_health = fct_reorder(access_health, proportion)) %>%
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -832,7 +843,8 @@ elec <- strat_design_srvyr_hhs %>%
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
-  filter(sample == "Enonkishu") %>% 
+  filter(sample == "Enonkishu") %>%
+  mutate(access_elec = fct_reorder(access_elec, proportion)) %>%
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -864,6 +876,7 @@ crops <- strat_design_srvyr_hhs %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(crop_yn = fct_reorder(crop_yn, proportion)) %>%
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -894,6 +907,7 @@ wildlife <- strat_design_srvyr_hhs %>%
             total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n())) %>% 
   filter(sample == "Enonkishu") %>% 
+  mutate(wild_perception = fct_reorder(wild_perception, proportion)) %>%
   na.omit() 
 #write.xlsx(inf, here::here("images", "authority_over_conservancy.xlsx"))
 
@@ -954,7 +968,8 @@ ggplot(agree, aes(x = x,
         #axis.title.y=element_blank(),
         #axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
-  ggtitle("Change in acceptance of conservancies \nbefore their establishment and now")
+  ggtitle("Change in acceptance of conservancies \nbefore their establishment and now") +
+  ylim(0,10)
 
 ggsave(filename = here::here("images", "Sankey agree with cons before after_enon.png"))
 

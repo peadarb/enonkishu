@@ -175,12 +175,6 @@ knitr::include_graphics("images/Sankey agree with cons before after_enon.png")
 ```
 
 ---
-class: full
-
-```{r echo=FALSE, out.width= "60%"}
-knitr::include_graphics("images/agree cons boxplot_enon.png")
-```
----
 class: center 
 
 **Livelihoods and Well-being**
@@ -224,13 +218,6 @@ knitr::include_graphics("images/access_to_electricity_enon.png")
 class: full
 
 ```{r echo=FALSE, out.width="90%"}
-knitr::include_graphics("images/skipping meals bar_enon.png")
-```
-
----
-class: full
-
-```{r echo=FALSE, out.width="90%"}
 knitr::include_graphics("images/skipping meals boxplot_enon.png")
 ```
 
@@ -267,11 +254,4 @@ class: full
 
 ```{r echo=FALSE, out.width="60%"}
 knitr::include_graphics("images/wellbeing boxplot enon.png")
-```
-
----
-class: full
-
-```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/wellbeing sankey enon.png")
 ```

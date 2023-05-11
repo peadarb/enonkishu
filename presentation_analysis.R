@@ -271,13 +271,13 @@ each_conserve_wall <- strat_design_srvyr_house %>%
             #total = survey_total(vartype = "ci", na.rm=TRUE),
             n= unweighted(n()))
 
-each_conserve_mobility <- strat_design_srvyr_house %>% 
+each_conserve_mobility <- strat_design_srvyr_house %>%
   #mutate(mobility = factor(mobility, levels = c(1,2,3), 
   #                      labels=c("None", "Partial", "Whole"))) %>%  
   group_by(sample, mobility) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
+            n= unweighted(n())) 
 
 ggplot(each_conserve_mobility, aes(x=sample, y=proportion, fill = mobility)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
@@ -307,7 +307,8 @@ each_conserve_edu <- strat_design_srvyr_edu %>%
   group_by(sample, edu) %>% 
   summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
             #total = survey_total(vartype = "ci", na.rm=TRUE),
-            n= unweighted(n()))
+            n= unweighted(n())) %>%
+  mutate(edu = fct_reorder(edu, proportion))
 
 ggplot(each_conserve_edu, aes(x=sample, y=proportion, group = edu, fill = edu)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single"), width = 0.95) +
