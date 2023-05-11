@@ -459,7 +459,7 @@ strat_design_srvyr_hhs <- hhs_wealth %>%
                                                                       settle_rules, settle_rules_help, forest_rules, forest_rules_help,
                                                                       water_rules, water_rules_help, wildlife_rules, wildlife_rules_help,
                                                                       receive_income, cons_payment_fct, income_informed, influence,
-                                                                      transparency, accountability, women_power, wild_perception))
+                                                                      transparency, accountability, women_power, wild_perception, hhnum_tourism, hhnum_conserve))
 
 a <- strat_design_srvyr_hhs %>% 
   group_by(sample, women_power) %>% 
@@ -1137,3 +1137,61 @@ occp_bar <- ggplot()+
 occp_bar
 
 cowplot::save_plot("images/occupation_totals.png", occp_bar)
+
+########################################################################################################################################################################################
+########   Tourism Occupation as totals ####################################################################################################################################
+########################################################################################################################################################################################
+
+occpt <- strat_design_srvyr_hhs %>% 
+  group_by(sample, hhnum_tourism) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  filter(sample == "Enonkishu") %>% 
+  na.omit() 
+
+occpt_bar <- ggplot()+
+  geom_bar(data = occpt, aes(x = hhnum_tourism, fill = total, group = hhnum_tourism), position = position_dodge()) +
+  # scale_fill_brewer(direction = -1) +
+  # theme_alluvial(base_size = 13) +
+  labs(xlab = NULL, ylab = NULL) +
+  theme(legend.position = "bottom",
+        plot.title = element_text(hjust = .1),
+        legend.title = element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank()) +
+  ggtitle("Number of people employed in tourism in Enonkishu Conservancy") 
+#ylim(0,100)
+
+occpt_bar
+
+cowplot::save_plot("images/tourism_occupation_totals.png", occpt_bar)
+
+########################################################################################################################################################################################
+########   Conservation Occupation as totals ####################################################################################################################################
+########################################################################################################################################################################################
+
+occpc <- strat_design_srvyr_hhs %>% 
+  group_by(sample, hhnum_conserve) %>% 
+  summarise(proportion = survey_mean(vartype = "ci", na.rm=TRUE),
+            total = survey_total(vartype = "ci", na.rm=TRUE),
+            n= unweighted(n())) %>% 
+  filter(sample == "Enonkishu") %>% 
+  na.omit() 
+
+occpc_bar <- ggplot()+
+  geom_bar(data = occpc, aes(x = hhnum_conserve, fill = total, group = hhnum_conserve), position = position_dodge()) +
+  # scale_fill_brewer(direction = -1) +
+  # theme_alluvial(base_size = 13) +
+  labs(xlab = NULL, ylab = NULL) +
+  theme(legend.position = "bottom",
+        plot.title = element_text(hjust = .1),
+        legend.title = element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank()) +
+  ggtitle("Number of people employed in conservation in Enonkishu Conservancy") 
+#ylim(0,100)
+
+occpc_bar
+
+cowplot::save_plot("images/conservation_occupation_totals.png", occpc_bar)

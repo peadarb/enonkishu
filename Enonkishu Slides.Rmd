@@ -196,13 +196,6 @@ knitr::include_graphics("images/Leaseholder Occupations_enon.png")
 class: full
 
 ```{r echo=FALSE, out.width="60%"}
-knitr::include_graphics("images/occupation_totals.png")
-```
-
----
-class: full
-
-```{r echo=FALSE, out.width="60%"}
 knitr::include_graphics("images/level of education completed_enon.png")
 ```
 
